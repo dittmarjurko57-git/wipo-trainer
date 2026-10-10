@@ -1,0 +1,848 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wirtschaftspolitik-Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* Layout: einspaltige Lern-App (max 680px), Kopfbereich wie Karopapier mit Konjunkturkurve */
+:root{
+  --paper:#eef2ee; --card:#ffffff; --ink:#16212b; --muted:#56626b; --line:#d3dcd5; --grid:#dbe4dd;
+  --accent:#0b6b60; --accent-ink:#ffffff; --accent-soft:#d5ebe5;
+  --amber:#9a6200; --amber-soft:#f6e8c8;
+  --ok:#22703a; --ok-soft:#dcefdf; --bad:#ad2a20; --bad-soft:#f8dedb;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#10161b; --card:#182128; --ink:#e5ebe8; --muted:#9ca8ae; --line:#2b363e; --grid:#1b252c;
+  --accent:#4cbfad; --accent-ink:#0b1a17; --accent-soft:#173833;
+  --amber:#e8b44c; --amber-soft:#3a2f16;
+  --ok:#72c486; --ok-soft:#183324; --bad:#f2918a; --bad-soft:#3d1f1d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#10161b; --card:#182128; --ink:#e5ebe8; --muted:#9ca8ae; --line:#2b363e; --grid:#1b252c;
+  --accent:#4cbfad; --accent-ink:#0b1a17; --accent-soft:#173833;
+  --amber:#e8b44c; --amber-soft:#3a2f16;
+  --ok:#72c486; --ok-soft:#183324; --bad:#f2918a; --bad-soft:#3d1f1d; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{background:var(--paper)}
+body{color:var(--ink);font:17px/1.55 var(--f-body);padding-inline:16px;-webkit-text-size-adjust:100%}
+#main{max-width:680px;margin:0 auto;padding-block:12px 80px}
+h1,h2,h3,h4{font-family:var(--f-display);line-height:1.15;text-wrap:balance;margin:0}
+h1{font-size:2.1rem;font-weight:800;letter-spacing:-.01em}
+h2{font-size:1.45rem;font-weight:700}
+h3{font-size:1.2rem;font-weight:700;margin-top:1.6em;margin-bottom:.5em}
+h4{font-size:1.02rem;font-weight:700}
+p{margin:.5em 0}
+b{font-weight:700}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.small{font-size:.86rem;color:var(--muted)}
+.eyebrow{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin:0 0 .4em}
+
+/* Startseite */
+.hero{border:1px solid var(--line);border-radius:18px;padding:20px 18px 14px;
+  background-color:var(--card);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:22px 22px}
+.hero p.intro{max-width:46ch;margin:.6em 0 0}
+.wave{width:100%;height:auto;display:block;margin-top:6px}
+.wave .trend{stroke:var(--muted);stroke-dasharray:5 5;stroke-width:1.5;fill:none}
+.wave .curve{stroke:var(--accent);stroke-width:3;fill:none;stroke-linecap:round}
+.wave text{fill:var(--muted);font:600 11px var(--f-body)}
+.wave .dot{fill:var(--card);stroke:var(--accent);stroke-width:2.5}
+.wave .dot.done{fill:var(--accent)}
+.wave .dot.next{stroke:var(--amber);stroke-width:3.5}
+.wave .dn{font:800 12px var(--f-display);fill:var(--accent)}
+.wave .dn.done{fill:var(--accent-ink)}
+.prog{font-weight:700;margin:2px 0 0;font-variant-numeric:tabular-nums}
+.day{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:26px 0 10px}
+.day span{color:var(--muted);font-size:.9rem}
+.units{display:grid;gap:10px}
+.unit{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;text-align:left;width:100%;
+  background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.unit:hover{border-color:var(--accent)}
+.unit .num{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font:800 1.1rem var(--f-display);
+  border:2px solid var(--accent);color:var(--accent)}
+.unit.done .num{background:var(--accent);color:var(--accent-ink)}
+.unit .ttl{font:700 1.08rem var(--f-display)}
+.unit .sub{color:var(--muted);font-size:.92rem;line-height:1.35}
+.unit .meta{font-size:.8rem;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chip{font-size:.74rem;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--accent-soft);color:var(--accent)}
+.chip.prio{background:var(--amber-soft);color:var(--amber)}
+.linkcard{display:block;width:100%;text-align:left;margin-top:26px;background:var(--accent-soft);border:0;border-radius:14px;padding:16px}
+.linkcard h4{color:var(--accent)}
+.reset{margin-top:28px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+/* Kopfzeile in Einheiten */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);padding-block:8px 8px;margin-bottom:4px}
+.toprow{display:flex;align-items:center;gap:10px}
+.back{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:6px 12px;font-weight:700}
+.toprow h2{font-size:1.15rem;flex:1;min-width:0}
+.steps{display:flex;gap:6px;overflow-x:auto;padding-block:8px 2px;scrollbar-width:none}
+.steps::-webkit-scrollbar{display:none}
+.stp{flex:0 0 auto;border:1px solid var(--line);background:var(--card);border-radius:99px;padding:5px 12px;font-size:.88rem;font-weight:700;color:var(--muted)}
+.stp.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.stp.ok::before{content:"✓ ";color:var(--ok)}
+.stp.on.ok::before{color:var(--paper)}
+
+/* Lerntext */
+.lesson .lead{font-size:1.1rem}
+.lesson ul,.lesson ol{padding-left:1.2em;margin:.4em 0}
+.lesson li{margin:.25em 0}
+.tw{overflow-x:auto;margin:.7em 0}
+table.t{border-collapse:collapse;width:100%;font-size:.93rem;background:var(--card)}
+table.t th,table.t td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+table.t th{background:var(--accent-soft);font-family:var(--f-display)}
+.duo{display:grid;gap:12px;margin:.8em 0}
+@media (min-width:620px){.duo{grid-template-columns:1fr 1fr}}
+.dcol{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;min-width:0}
+.kicker{color:var(--accent);font-weight:700;font-size:.9rem;margin:.1em 0 .5em}
+.ex{font-size:.9rem;color:var(--muted)}
+.note,.tip,.teach{border-radius:12px;padding:12px 14px;margin:1em 0}
+.note{background:var(--amber-soft)}
+.tip{background:var(--accent-soft)}
+.teach{border:2px dashed var(--accent);background:var(--card)}
+.teach .lbl{display:inline-block;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;font-weight:700;color:var(--accent);margin-bottom:4px}
+.chain{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:.7em 0}
+.formula{font:700 1.35rem var(--f-display);text-align:center;margin:.6em 0;letter-spacing:.02em}
+.phases,.goals{display:grid;gap:10px;margin:.8em 0}
+@media (min-width:560px){.phases,.goals{grid-template-columns:1fr 1fr}}
+.ph,.g{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;min-width:0}
+.ph h4 span{font-weight:500;color:var(--muted)}
+.ph p,.g p{font-size:.93rem;margin:.3em 0}
+.g.new{border-style:dashed}
+.rel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:.6em 0}
+.rel h4::before{display:inline-block;font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:99px;margin-right:6px;vertical-align:2px}
+.rel.bad h4::before{content:"Konflikt";background:var(--bad-soft);color:var(--bad)}
+.rel.good h4::before{content:"Harmonie";background:var(--ok-soft);color:var(--ok)}
+.rel.neu h4::before{content:"Neutral";background:var(--line);color:var(--ink)}
+.rel p{margin:.3em 0 0;font-size:.95rem}
+ol.big{padding-left:1.4em}
+ol.big li{margin:.55em 0}
+.cyc{width:100%;height:auto;max-width:520px;display:block;margin:.4em auto}
+.cyc .trend{stroke:var(--muted);stroke-dasharray:5 5;stroke-width:1.5;fill:none}
+.cyc .curve{stroke:var(--accent);stroke-width:3;fill:none}
+.cyc text{fill:var(--ink);font:700 11px var(--f-body)}
+.cyc .lab2{fill:var(--muted);font-weight:400}
+
+/* Knöpfe */
+.btn{display:inline-block;border:0;border-radius:12px;padding:13px 18px;font-weight:700;background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent;color:var(--accent);border:2px solid var(--accent)}
+.btn.warn{background:var(--bad);color:var(--card)}
+.btn.wide{width:100%;margin-top:18px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+
+/* Karteikarten */
+.flash{width:100%;min-height:240px;border:1px solid var(--line);border-radius:18px;background:var(--card);
+  display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:24px 20px;gap:10px}
+.flash .term{font:800 1.6rem var(--f-display)}
+.flash .def{font-size:1.08rem;max-width:42ch}
+.flash .hint{font-size:.85rem;color:var(--muted)}
+.flash.back{background:var(--accent-soft);border-color:var(--accent)}
+.counter{display:flex;justify-content:space-between;color:var(--muted);font-size:.9rem;margin-bottom:8px;font-variant-numeric:tabular-nums}
+
+/* Quiz */
+.qhead{display:flex;justify-content:space-between;color:var(--muted);font-size:.9rem;font-variant-numeric:tabular-nums}
+.bar{height:6px;border-radius:99px;background:var(--line);margin:6px 0 14px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent)}
+.q{font-size:1.18rem;margin:.4em 0 .7em}
+.opts{display:grid;gap:9px}
+.opt{text-align:left;border:1.5px solid var(--line);background:var(--card);border-radius:12px;padding:13px 14px;line-height:1.4}
+.opt:hover:not([disabled]){border-color:var(--accent)}
+.opt.right{background:var(--ok-soft);border-color:var(--ok)}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad)}
+.opt.dim{opacity:.6}
+.expl{border-radius:12px;padding:12px 14px;margin-top:12px}
+.expl.ok{background:var(--ok-soft)}
+.expl.bad{background:var(--bad-soft)}
+.expl.ok b{color:var(--ok)} .expl.bad b{color:var(--bad)}
+details.ctx{background:var(--amber-soft);border-radius:12px;padding:10px 14px;margin-bottom:10px}
+details.ctx summary{font-weight:700;cursor:pointer}
+details.ctx table.t{font-size:.88rem;margin-top:8px}
+.result{text-align:center;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px 18px}
+.result .big{font:800 3rem var(--f-display);color:var(--accent);font-variant-numeric:tabular-nums}
+.sol{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-top:14px}
+
+/* Sortieren */
+.sortcard{border:1px solid var(--line);border-radius:18px;background:var(--card);padding:26px 18px;text-align:center;font:700 1.15rem var(--f-display);min-height:130px;display:grid;place-items:center}
+.sortbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.sortbtns button{border:2px solid var(--accent);background:var(--card);color:var(--accent);border-radius:12px;padding:14px 8px;font-weight:700}
+.sortbtns button.right{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.sortbtns button.wrong{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+
+textarea{width:100%;min-height:220px;font:inherit;font-size:1rem;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:99px;font-weight:700;z-index:20;max-width:90vw;text-align:center}
+@media (prefers-reduced-motion:no-preference){.flash,.opt,.unit{transition:background-color .15s,border-color .15s}}
+</style>
+</head>
+<body>
+
+<main id="main"><div style="padding:24px 4px;max-width:520px;margin:0 auto">
+<h1 style="font-size:1.6rem">Wirtschaftspolitik-Trainer</h1>
+<p>Die App wird geladen … Falls hier nichts passiert, öffne diese Seite bitte direkt in Safari oder Chrome (nicht in einer App-Vorschau).</p>
+</div></main>
+
+<script>
+/* ---------- Hilfsfunktionen ---------- */
+const $ = s => document.querySelector(s);
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const KEY = 'wipo-trainer-v1';
+let P = { done: {}, score: {}, wrong: {}, notes: {} };
+try { const s = localStorage.getItem(KEY); if (s) P = Object.assign(P, JSON.parse(s)); } catch (e) {}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(P)); } catch (e) {} }
+
+/* Konjunkturkurve */
+function wy(x) { return 108 - (x - 10) * 50 / 320 + 26 * Math.cos(2 * Math.PI * (x - 30) / 200); }
+function curvePath() { let d = ''; for (let x = 10; x <= 330; x += 4) d += (d ? ' L' : 'M') + x + ' ' + wy(x).toFixed(1); return d; }
+function cycleSVG() {
+  return '<svg class="cyc" viewBox="0 0 340 170" role="img" aria-label="Konjunkturzyklus: Wellenbewegung des BIP um den langfristigen Wachstumstrend">' +
+    '<line x1="6" y1="160" x2="334" y2="160" stroke="currentColor" opacity=".35"/><line x1="6" y1="6" x2="6" y2="160" stroke="currentColor" opacity=".35"/>' +
+    '<text x="10" y="14" class="lab2">BIP</text><text x="334" y="154" text-anchor="end" class="lab2">Zeit</text>' +
+    '<path class="trend" d="M10 108 L330 58"/><text x="300" y="52" text-anchor="end" class="lab2">langfristiger Trend</text>' +
+    '<path class="curve" d="' + curvePath() + '"/>' +
+    '<text x="38" y="148">Depression</text>' +
+    '<text x="72" y="' + (wy(80)).toFixed(0) + '" text-anchor="end">Aufschwung</text>' +
+    '<text x="130" y="' + (wy(130) - 10).toFixed(0) + '" text-anchor="middle">Boom</text>' +
+    '<text x="190" y="' + (wy(180) - 4).toFixed(0) + '">Rezession</text>' +
+    '</svg>';
+}
+function homeWave(doneArr, next) {
+  const xs = [32, 88, 144, 200, 256, 312];
+  let s = '<svg class="wave" viewBox="0 0 340 150" role="img" aria-label="Fortschritt: 6 Lernblöcke entlang einer Konjunkturkurve">' +
+    '<path class="trend" d="M10 108 L330 58"/><path class="curve" d="' + curvePath() + '"/>';
+  xs.forEach((x, i) => {
+    const y = wy(x); const c = doneArr[i] ? 'done' : (i === next ? 'next' : '');
+    s += '<circle class="dot ' + c + '" cx="' + x + '" cy="' + y.toFixed(1) + '" r="12"/>' +
+      '<text class="dn ' + (doneArr[i] ? 'done' : '') + '" x="' + x + '" y="' + (y + 4.3).toFixed(1) + '" text-anchor="middle">' + (i + 1) + '</text>';
+  });
+  return s + '</svg>';
+}
+
+/* ---------- Inhalte ---------- */
+const L1 = `
+<p class="lead">Die Wirtschaft wächst nicht gleichmäßig. Sie schwankt in Wellen um ihren langfristigen Wachstumstrend. Diese Schwankungen heißen <b>Konjunktur</b>. Gemessen wird sie vor allem am <b>realen BIP</b>.</p>
+${cycleSVG()}
+<h3>Die vier Phasen</h3>
+<div class="phases">
+<div class="ph"><h4>Aufschwung <span>(Expansion)</span></h4><p>Nachfrage und Produktion steigen, Unternehmen investieren wieder, Optimismus wächst. Die Arbeitslosigkeit beginnt zu sinken.</p></div>
+<div class="ph"><h4>Boom <span>(Hochkonjunktur)</span></h4><p>Kapazitätsgrenze erreicht, kaum Arbeitslosigkeit, Fachkräfte fehlen. Löhne und Preise steigen stark: <b>Inflationsgefahr</b>.</p></div>
+<div class="ph"><h4>Rezession</h4><p>Nachfrage und Produktion gehen zurück, Investitionen werden verschoben. Die Arbeitslosigkeit steigt.</p></div>
+<div class="ph"><h4>Depression <span>(Krise, Tiefpunkt)</span></h4><p>Hohe Arbeitslosigkeit, schwache Nachfrage, pessimistische Erwartungen, niedrige Zinsen. Danach beginnt der nächste Aufschwung.</p></div>
+</div>
+<div class="teach"><span class="lbl">Definitionen aus deinem Unterricht</span>
+<p><b>Abschwung:</b> Stagnation von einem Quartal zum anderen.<br>
+<b>Rezession:</b> Stagnation oder Schrumpfen über mindestens zwei Quartale.<br>
+<b>Depression:</b> Schrumpfen der Wirtschaft über mehrere Jahre.</p>
+<p class="small">Achtung: Manche Quellen (auch das „Master-Briefing“) setzen Abschwung und Rezession gleich. In der Klausur gilt die Definition deiner Lehrkraft.</p></div>
+<h3>Das BIP: der wichtigste Maßstab</h3>
+<p>Das Bruttoinlandsprodukt ist der Wert aller in einem Jahr im Inland hergestellten Waren und Dienstleistungen (Endprodukte).</p>
+<p class="formula">BIP = C + I + G + (X − M)</p>
+<div class="tw"><table class="t"><tr><th>Buchstabe</th><th>Bedeutung</th></tr>
+<tr><td><b>C</b></td><td>privater Konsum der Haushalte</td></tr>
+<tr><td><b>I</b></td><td>Investitionen der Unternehmen und des Staates</td></tr>
+<tr><td><b>G</b></td><td>Staatsausgaben für Güter und Dienstleistungen</td></tr>
+<tr><td><b>X − M</b></td><td>Exporte minus Importe (Außenbeitrag)</td></tr></table></div>
+<p>Die Formel zeigt dir, <b>wo eine Maßnahme ansetzt</b>: Ein Konjunkturprogramm erhöht G, eine Steuersenkung für Haushalte C, eine Investitionsförderung I.</p>
+<div class="tw"><table class="t"><tr><th>Kennzahl</th><th>misst</th><th>nützlich für</th></tr>
+<tr><td><b>Nominales BIP</b></td><td>Produktionswert zu laufenden Preisen</td><td>Größenvergleiche, internationale Ranglisten</td></tr>
+<tr><td><b>Reales BIP</b></td><td>Produktion ohne Preiseffekt</td><td>Wachstum, Rezession, Konjunktur</td></tr>
+<tr><td><b>BIP pro Kopf</b></td><td>BIP geteilt durch Einwohnerzahl</td><td>Vergleich des durchschnittlichen Wohlstands</td></tr></table></div>
+<h3>Konjunkturindikatoren</h3>
+<p>Indikatoren sind Messgrößen, an denen man die Phase ablesen kann. Entscheidend ist, <i>wann</i> sie reagieren. Diese Einteilung stammt aus deinem Unterricht:</p>
+<div class="tw"><table class="t"><tr><th>Frühindikatoren</th><th>Präsenzindikatoren</th><th>Spätindikatoren</th></tr>
+<tr><td>erlauben Prognosen, sind aber spekulativ</td><td>zeigen den Ist-Zustand</td><td>folgen der Entwicklung verzögert</td></tr>
+<tr><td>Gewinnerwartung<br>Auftragslage<br>Geschäftsklimaindex (ifo)<br>ZEW-Index<br>Aktienindex</td><td>BIP<br>Wirtschaftswachstum<br>Sparquote<br>Preisniveau<br>offene Stellen</td><td>Arbeitslosenquote<br>Inflation<br>Insolvenzen<br>Steuereinnahmen<br>Zinsniveau</td></tr></table></div>
+<p><b>Warum ist die Arbeitslosenquote ein Spätindikator?</b> Unternehmen entlassen erst, wenn sie sicher sind, dass die Krise anhält, und stellen erst ein, wenn der Aufschwung sicher ist.</p>
+<p><b>Konjunktur vs. Wachstum:</b> Konjunktur = kurzfristige Schwankungen. Wirtschaftswachstum = langfristige Entwicklung (der Trend).</p>
+<div class="tip"><b>Klausur-Tipp:</b> Ordne eine Phase nie aus dem Bauch heraus ein. Belege sie mit 2–3 Indikatoren aus dem Material: „Das reale BIP ist zwei Quartale geschrumpft, die Auftragslage verschlechtert sich und die Arbeitslosenquote steigt. Das spricht für eine Rezession.“</div>`;
+
+const L2 = `
+<p class="lead">Der Staat kann in der Wirtschaft zwei Dinge tun: die <b>Spielregeln</b> festlegen oder selbst <b>ins Spiel eingreifen</b>.</p>
+<div class="duo">
+<div class="dcol"><h4>Ordnungspolitik</h4><p class="kicker">Die Spielregeln</p><ul>
+<li>legt die Grundsätze und <b>Regeln für alles wirtschaftliche Handeln</b> fest (Rahmenbedingungen)</li>
+<li><b>langfristig</b> angelegt, ändert sich selten</li>
+<li>gibt <b>keine einzelnen Spielzüge</b> vor. Die „Spieler“ (Unternehmer und Verbraucher) entscheiden selbst</li>
+<li>Ziele: fairen Wettbewerb sichern, Marktmissbrauch verhindern</li></ul>
+<p class="ex">Beispiele: Kartellgesetze gegen Preisabsprachen, Eigentums- und Vertragsrecht, Tarifautonomie, Mindestlohngesetz, Schuldenbremse, unabhängige Zentralbank, Verbraucher- und Umweltschutzgesetze</p></div>
+<div class="dcol"><h4>Prozesspolitik</h4><p class="kicker">Das Eingreifen ins Spiel</p><ul>
+<li>steuert <b>wirtschaftliche Prozesse direkt</b>: Produktion, Einkommen, Konsum, Exporte, Investitionen</li>
+<li>der Staat mischt sich selbst als „Spieler“ ein</li>
+<li><b>kurz- bis mittelfristig</b>, oft befristet</li>
+<li>Ziele: Konjunkturschwankungen abmildern, Krisen entgegenwirken</li></ul>
+<p class="ex">Beispiele: Konjunkturpakete (z. B. staatlicher Straßenbau), befristete Steuersenkungen, Abwrackprämie, verlängertes Kurzarbeitergeld, Leitzinsänderung der EZB</p></div>
+</div>
+<div class="teach"><span class="lbl">Aus deinem Unterricht</span>
+<p>Prozesspolitik wird in drei „Spielzüge“ unterteilt:</p>
+<ul><li><b>Konjunkturpolitik:</b> für eine gleichmäßige Konjunkturentwicklung</li>
+<li><b>Wachstumspolitik:</b> zur langfristigen Sicherung von Investitionen</li>
+<li><b>Strukturpolitik:</b> gegen regionale Ungleichgewichte und Krisen einzelner Branchen, die sonst hohe Arbeitslosigkeit zur Folge hätten</li></ul></div>
+<div class="note"><b>Vergleich mit Schach oder Fußball:</b> Ordnungspolitik schreibt das Regelbuch. Prozesspolitik bedeutet, dass der Staat selbst Figuren zieht oder als Trainer mitten im Spiel die Taktik ändert.</div>
+<h3>Der Zuordnungs-Test</h3>
+<ol><li>Setzt die Maßnahme eine <b>dauerhafte Regel</b> für alle? → <b>Ordnungspolitik</b></li>
+<li>Reagiert sie auf eine <b>aktuelle Lage</b> (Krise, Inflation) und greift sie direkt in den Ablauf ein? → <b>Prozesspolitik</b></li></ol>
+<p>Es gibt Grenzfälle. Dann zählt deine <b>Begründung</b>: Schreib dazu, warum du so zuordnest.</p>
+<h3>Wer macht Geldpolitik?</h3>
+<p>Im Euroraum entscheidet die unabhängige <b>Europäische Zentralbank (EZB)</b> über die Leitzinsen. Ihr Hauptziel ist Preisniveaustabilität (mittelfristig 2 % Inflation). Die Bundesregierung macht <b>Fiskalpolitik</b> (Staatsausgaben, Steuern). Schreib also nie „Die Regierung senkt die Zinsen“.</p>
+<h3>Soziale Marktwirtschaft (SMW)</h3>
+<p>Die Wirtschaftsordnung Deutschlands seit 1948/49. <b>Merke:</b> Sie verbindet die Freiheit des Marktes mit sozialer Sicherheit und staatlichen Regeln.</p>
+<div class="duo">
+<div class="dcol"><h4>Wirtschaftliche Freiheit</h4><ul><li>freier Wettbewerb zwischen Unternehmen</li><li>Eigeninitiative und unternehmerische Freiheit</li><li>Gewinnstreben als Anreiz</li></ul></div>
+<div class="dcol"><h4>Sozialer Ausgleich</h4><ul><li>Sozialversicherungen (z. B. Kranken- und Rentenversicherung)</li><li>Umverteilung durch Steuern und Sozialleistungen</li><li>Schutz der Arbeitnehmer</li></ul></div></div>
+<p><b>Rolle des Staates:</b> Er legt die Spielregeln fest und schützt den Wettbewerb (z. B. Kartellgesetze), greift aber nicht direkt in jeden Vorgang ein.</p>
+<ul><li><b>Alfred Müller-Armack</b> prägte den Begriff „Soziale Marktwirtschaft“.</li>
+<li><b>Ludwig Erhard</b> setzte sie als Wirtschaftsminister politisch um.</li>
+<li>Grundlage ist der <b>Ordoliberalismus</b> (Walter Eucken): Der Staat soll vor allem eine gute Wettbewerbsordnung sichern. Eingriffe in den Ablauf nur sparsam.</li>
+<li><b>Marktkonformität:</b> Eingriffe sollen den Preismechanismus möglichst nicht außer Kraft setzen.</li>
+<li><b>Grundgesetz:</b> Sozialstaatsprinzip (Art. 20 Abs. 1), „Eigentum verpflichtet“ (Art. 14 Abs. 2).</li></ul>
+<div class="tip"><b>So nutzt du die SMW in der Klausur:</b> als Maßstab für Begründungen. „Die Maßnahme ist marktkonform, weil …“ · „Sie entspricht dem sozialen Ausgleich der SMW, da …“ · „Kritisch ist, dass der Staat hier stark in den Wettbewerb eingreift.“</div>`;
+
+const L3 = `
+<p class="lead">Zwei Denkschulen, zwei Diagnosen: Woran liegt eine Wirtschaftskrise, und was soll der Staat tun?</p>
+<div class="tw"><table class="t">
+<tr><th>Merkmal</th><th>Angebotsorientierung</th><th>Nachfrageorientierung</th></tr>
+<tr><td><b>Hauptdenker</b></td><td>Milton Friedman (Monetarismus)</td><td>John Maynard Keynes (Keynesianismus)</td></tr>
+<tr><td><b>Grundannahme</b></td><td>Märkte sind von Natur aus stabil</td><td>Märkte sind instabil und krisenanfällig</td></tr>
+<tr><td><b>Fokus</b></td><td>das Angebot: Unternehmen und Produktionsbedingungen</td><td>die Gesamtnachfrage der Verbraucher (und des Staates)</td></tr>
+<tr><td><b>Rolle des Staates</b></td><td>zurückhaltend (<b>Ordnungspolitik</b>)</td><td>aktiv eingreifend (<b>Prozesspolitik</b>)</td></tr>
+<tr><td><b>Wichtigstes Ziel</b></td><td>Preisniveaustabilität und Wettbewerb</td><td>Vollbeschäftigung</td></tr>
+<tr><td><b>Zeithorizont</b></td><td>eher langfristig</td><td>besonders in Krisen, kurzfristig</td></tr>
+</table></div>
+<p class="small">Die Tabelle folgt deinem Unterrichtsmaterial. Merke dir besonders die Verbindung <b>Angebot ↔ Ordnungspolitik</b> und <b>Nachfrage ↔ Prozesspolitik</b>.</p>
+<h3>Die Grundideen als Wirkungskette</h3>
+<div class="chain"><b>Angebot:</b> gute Rahmenbedingungen (niedrige Steuern, wenig Bürokratie) → Unternehmen investieren → günstigere Produktion → neue Arbeitsplätze</div>
+<div class="chain"><b>Nachfrage:</b> mehr Ausgaben (Staat oder Verbraucher) → steigende Nachfrage → mehr Produktion → neue Arbeitsplätze. Zusätzliches Einkommen wird wieder ausgegeben, dadurch entstehen weitere Aufträge (<b>Multiplikatoreffekt</b>).</div>
+<p><b>Antizyklisch</b> heißt bei Keynes: Der Staat handelt gegen den Konjunkturverlauf. In der Krise gibt er mehr aus, auch auf Kredit (<b>Deficit Spending</b>). Im Boom soll er sparen und die Schulden zurückzahlen.</p>
+<p><b>Monetarismus</b> (Friedman): Die Zentralbank soll die Geldmenge stetig wachsen lassen, damit das Preisniveau stabil bleibt. Der Staat soll sich mit kurzfristigen Eingriffen zurückhalten.</p>
+<h3>Typische Maßnahmen</h3>
+<div class="duo">
+<div class="dcol"><h4>Angebotsorientiert</h4><ul><li>Unternehmenssteuern senken</li><li>Arbeitsmärkte flexibilisieren (z. B. Agenda 2010)</li><li>Bürokratie abbauen, Genehmigungen beschleunigen</li><li>Lohnnebenkosten senken</li><li>Deregulierung und Privatisierung</li><li>Staatshaushalt konsolidieren</li></ul></div>
+<div class="dcol"><h4>Nachfrageorientiert</h4><ul><li>staatliche Investitionen, Konjunkturpakete (z. B. Straßenbau)</li><li>Steuersenkungen für niedrige Einkommen</li><li>Deficit Spending (Schuldenfinanzierung)</li><li>höhere Transfers (z. B. Kindergeld)</li><li>Kaufanreize wie die Abwrackprämie 2009</li><li>Kurzarbeitergeld stabilisiert Einkommen</li></ul></div></div>
+<h3>Kritik und Risiken: Hier gibt es Punkte</h3>
+<div class="duo">
+<div class="dcol"><h4>Risiken der Angebotspolitik</h4><ul>
+<li>Zunahme <b>sozialer Ungleichheit</b> möglich</li>
+<li>Die <b>Kaufkraft</b> der Verbraucher wird möglicherweise vernachlässigt</li>
+<li>Bessere Bedingungen führen <b>nicht automatisch zu Investitionen</b> (fehlende Investitionsbereitschaft, Gewinne werden ausgeschüttet)</li>
+<li>wirkt nur <b>langsam</b>, hilft in einer akuten Krise kaum</li>
+<li>Steuerausfälle müssen gegenfinanziert werden</li></ul></div>
+<div class="dcol"><h4>Risiken der Nachfragepolitik</h4><ul>
+<li><b>steigende Staatsverschuldung</b> durch Deficit Spending (Schuldenbremse begrenzt den Spielraum)</li>
+<li><b>Inflationsgefahr</b>, wenn zusätzliche Nachfrage auf eine voll ausgelastete Wirtschaft trifft</li>
+<li><b>Time Lags:</b> Maßnahmen wirken oft stark zeitverzögert, im schlimmsten Fall erst im nächsten Aufschwung</li>
+<li>Im Boom wird selten gespart, die Schulden bleiben</li>
+<li><b>Mitnahmeeffekte</b> und <b>Strohfeuer</b> (Wirkung verpufft)</li>
+<li><b>Crowding-out:</b> Staatliche Kredite treiben Zinsen hoch und verdrängen private Investitionen</li></ul></div></div>
+<div class="tip"><b>Merksatz:</b> Liegt das Problem bei den <b>Käufern</b> (keiner kauft), passt die Nachfrageorientierung. Liegt es bei den <b>Produzenten</b> (Produzieren ist zu teuer oder lohnt sich nicht), passt die Angebotsorientierung. In der Praxis werden beide oft kombiniert.</div>`;
+
+const L4 = `
+<p class="lead">Das <b>Stabilitätsgesetz von 1967</b> verpflichtet den Staat auf vier Ziele: das <b>magische Viereck</b>. Es wurde später um zwei Ziele zum <b>magischen Sechseck</b> erweitert.</p>
+<div class="goals">
+<div class="g"><h4>Preisniveaustabilität</h4><p>auch: stabiles Preisniveau</p><p>Messung: Inflationsrate (Verbraucherpreisindex). Orientierung: EZB-Ziel von 2 %</p></div>
+<div class="g"><h4>Hoher Beschäftigungsstand</h4><p>auch: Vollbeschäftigung</p><p>Messung: Arbeitslosenquote (Anteil der Arbeitslosen an den Erwerbspersonen)</p></div>
+<div class="g"><h4>Außenwirtschaftliches Gleichgewicht</h4><p>Messung: Leistungsbilanz bzw. Außenbeitrag (Exporte minus Importe). Ziel: annähernd ausgeglichen</p></div>
+<div class="g"><h4>Stetiges und angemessenes Wirtschaftswachstum</h4><p>Messung: Veränderung des realen BIP. Ziel: gleichmäßig, ohne starke Schwankungen</p></div>
+<div class="g new"><h4>Gerechte Einkommens- und Vermögensverteilung</h4><p>Erweiterung · Messung z. B. Gini-Koeffizient, Armutsquote</p></div>
+<div class="g new"><h4>Schutz der natürlichen Umwelt</h4><p>Erweiterung · auch: Umweltschutz · Messung z. B. CO₂-Emissionen</p></div>
+</div>
+<p class="small">Die gestrichelten Ziele sind die Erweiterung. Sie stehen nicht im Stabilitätsgesetz.</p>
+<p><b>Warum „magisch“?</b> Die vollständige gleichzeitige Erreichung aller Ziele ist nahezu unmöglich, weil sich manche Ziele gegenseitig behindern.</p>
+<h3>Zielbeziehungen</h3>
+<p><b>Zielkonflikt:</b> Das Erreichen eines Ziels erschwert ein anderes. <b>Zielharmonie:</b> Die Ziele unterstützen sich. <b>Zielneutralität:</b> kein wesentlicher Einfluss aufeinander.</p>
+<div class="rel bad"><h4>Preisniveaustabilität ↔ Beschäftigung</h4><p>Steigende Beschäftigung → mehr Einkommen und Nachfrage → Preise steigen (Inflation). Umgekehrt bremsen Zinserhöhungen gegen Inflation die Investitionen und kosten Jobs. Dieser Zusammenhang heißt <b>Phillips-Kurve</b>.</p></div>
+<div class="rel bad"><h4>Wachstum ↔ Umweltschutz</h4><p>Mehr Produktion bedeutet meist mehr Energie- und Rohstoffverbrauch und mehr Emissionen.</p></div>
+<div class="rel bad"><h4>Wachstum ↔ Preisniveaustabilität</h4><p>Starkes Wachstum im Boom führt zur Überhitzung: Kapazitäten am Limit, Preise steigen.</p></div>
+<div class="rel bad"><h4>Wachstum ↔ gerechte Verteilung</h4><p>Mehr Umverteilung durch höhere Steuern kann Investitionsanreize senken. Umgekehrt kann eine Entlastung von Unternehmen die Ungleichheit erhöhen. (Politisch umstritten.)</p></div>
+<div class="rel bad"><h4>Beschäftigung ↔ außenwirtschaftliches Gleichgewicht</h4><p>Ein Exportboom schafft Jobs, vergrößert aber den Exportüberschuss.</p></div>
+<div class="rel good"><h4>Wachstum ↔ Beschäftigung</h4><p>Unternehmen produzieren mehr → sie benötigen mehr Arbeitskräfte.</p></div>
+<div class="rel good"><h4>Beschäftigung ↔ gerechte Verteilung</h4><p>Wer Arbeit hat, hat eigenes Einkommen. Arbeitslosigkeit ist eine Hauptursache für Armut.</p></div>
+<div class="rel good"><h4>Preisniveaustabilität ↔ Wachstum</h4><p>Stabile Preise geben Planungssicherheit, Unternehmen investieren eher.</p></div>
+<div class="rel good"><h4>Umweltschutz ↔ Wachstum und Beschäftigung (möglich)</h4><p>Investitionen in erneuerbare Energien oder Gebäudesanierung schaffen Aufträge und Jobs und senken Emissionen.</p></div>
+<div class="rel neu"><h4>Umweltschutz ↔ außenwirtschaftliches Gleichgewicht</h4><p>Beispiel aus dem Master-Briefing für Zielneutralität: Die beiden Ziele beeinflussen sich kaum.</p></div>
+<div class="tip"><b>So fragt die Klausur:</b> „Erläutere Konflikte und Harmonien in Bezug auf Maßnahme X.“ Dann: 1. Welches Ziel soll X fördern? 2. Wirkungskette dazu. 3. Welches andere Ziel gerät unter Druck? 4. Welches Ziel profitiert zusätzlich?</div>`;
+
+const L5 = `
+<p class="lead">In der Klausur sollst du für eine Wirtschaftslage <b>Maßnahmen entwickeln, begründen und beurteilen</b>. Mit diesem „Klausur-Algorithmus“ gehst du jeden Fall gleich an.</p>
+<ol class="big">
+<li><b>Diagnose (Zyklus):</b> Indikatoren aus dem Material nennen und die Konjunkturphase einordnen.</li>
+<li><b>Bedrohtes Ziel (Sechseck):</b> Welche Ziele sind verletzt? Liegt das Problem bei der Nachfrage oder beim Angebot?</li>
+<li><b>Strategiewahl:</b> nachfrage- oder angebotsorientiert? Ordnungs- oder Prozesspolitik?</li>
+<li><b>Maßnahme und Begründung:</b> konkrete Maßnahme nennen und die Wirkungskette aufschreiben: Maßnahme → … → Ziel.</li>
+<li><b>Beurteilung:</b> Pro und Contra anhand von Kriterien, Zielkonflikte benennen, eigenes Fazit.</li></ol>
+<h3>Beurteilungskriterien</h3>
+<div class="tw"><table class="t"><tr><th>Kriterium</th><th>Leitfrage</th></tr>
+<tr><td>Wirksamkeit</td><td>Erreicht die Maßnahme das Ziel? Passt sie zur Ursache des Problems?</td></tr>
+<tr><td>Zeit</td><td>Wie schnell wirkt sie? Gibt es Time Lags?</td></tr>
+<tr><td>Nebenwirkungen</td><td>Welche Zielkonflikte im Sechseck entstehen?</td></tr>
+<tr><td>Kosten</td><td>Was kostet es? Neue Schulden? Schuldenbremse?</td></tr>
+<tr><td>Soziale Marktwirtschaft</td><td>Ist sie marktkonform? Sozial ausgewogen?</td></tr>
+<tr><td>Nachhaltigkeit</td><td>Langfristig sinnvoll oder Strohfeuer? Umweltfolgen?</td></tr></table></div>
+<h3>Operatoren</h3>
+<div class="tw"><table class="t">
+<tr><td><b>erläutern</b></td><td>Sachverhalt erklären und mit Beispielen oder Belegen veranschaulichen</td></tr>
+<tr><td><b>entwickeln</b></td><td>einen eigenen, begründeten Lösungsvorschlag erarbeiten</td></tr>
+<tr><td><b>beurteilen</b></td><td>Sachurteil: Pro und Contra anhand von Kriterien abwägen, Fazit ziehen</td></tr>
+<tr><td><b>bewerten</b></td><td>wie beurteilen, zusätzlich mit eigenen Wertmaßstäben (Werturteil)</td></tr></table></div>
+<p class="small">Die genauen Operator-Definitionen können an deiner Schule leicht abweichen.</p>
+<h3>Formulierungshilfen</h3>
+<ul>
+<li>„Die Daten aus M1 deuten auf eine Rezession hin, da das reale BIP … und die Arbeitslosenquote …“</li>
+<li>„Gefährdet sind vor allem die Ziele … des magischen Sechsecks.“</li>
+<li>„Aus nachfrageorientierter Sicht empfiehlt sich …, weil die Ursache in einer zu geringen Nachfrage liegt.“</li>
+<li>„Es handelt sich um eine prozesspolitische Maßnahme, da der Staat kurzfristig direkt in den Wirtschaftsablauf eingreift.“</li>
+<li>„Die Maßnahme wirkt über folgende Kette: … → … → …“</li>
+<li>„Für die Maßnahme spricht …, dagegen spricht …“</li>
+<li>„Insgesamt halte ich die Maßnahme für (eher) geeignet, weil das Argument … schwerer wiegt als …“</li></ul>
+<div class="tip"><b>Diese Punkte bringen sicher etwas:</b> Phase sauber mit Daten belegen, eine passende Maßnahme mit Wirkungskette, korrekte Zuordnung (Ordnung/Prozess, Angebot/Nachfrage), je zwei Pro- und Contra-Argumente und ein klares Fazit.</div>`;
+
+/* Karteikarten */
+const C1 = [
+["Konjunktur","Schwankungen der wirtschaftlichen Aktivität (v. a. des realen BIP) um den langfristigen Wachstumstrend."],
+["Bruttoinlandsprodukt (BIP)","Wert aller in einem Jahr im Inland hergestellten Waren und Dienstleistungen (Endprodukte)."],
+["BIP = C + I + G + (X − M)","Konsum der Haushalte + Investitionen + Staatsausgaben + (Exporte − Importe)."],
+["Reales BIP","BIP ohne Preiseffekt. Maßstab für Wachstum, Rezession und Konjunktur."],
+["Nominales BIP","BIP zu laufenden Preisen. Für Größenvergleiche und internationale Ranglisten."],
+["BIP pro Kopf","BIP geteilt durch die Einwohnerzahl. Zeigt den durchschnittlichen Wohlstand."],
+["Aufschwung","Produktion und Nachfrage steigen, Optimismus wächst, Arbeitslosigkeit beginnt zu sinken."],
+["Boom","Hochkonjunktur: Kapazitätsgrenze erreicht, kaum Arbeitslosigkeit, Inflationsgefahr."],
+["Abschwung (Unterricht)","Stagnation von einem Quartal zum anderen."],
+["Rezession (Unterricht)","Stagnation oder Schrumpfen der Wirtschaft über mindestens zwei Quartale."],
+["Depression (Unterricht)","Schrumpfen der Wirtschaft über mehrere Jahre. Hohe Arbeitslosigkeit, schwache Nachfrage."],
+["Frühindikatoren","Erlauben Prognosen, sind aber spekulativ: Gewinnerwartung, Auftragslage, Geschäftsklimaindex, ZEW-Index, Aktienindex."],
+["Präsenzindikatoren","Zeigen den Ist-Zustand: BIP, Wirtschaftswachstum, Sparquote, Preisniveau, offene Stellen."],
+["Spätindikatoren","Folgen der Entwicklung verzögert: Arbeitslosenquote, Inflation, Insolvenzen, Steuereinnahmen, Zinsniveau."],
+["Geschäftsklimaindex (ifo)","Frühindikator: Unternehmen werden nach aktueller Lage und Erwartungen befragt."],
+["Stagflation","Stagnation (kein Wachstum) bei gleichzeitig hoher Inflation."]];
+const C2 = [
+["Ordnungspolitik","Legt die Spielregeln (Rahmenbedingungen) für alles wirtschaftliche Handeln fest. Langfristig. Ziel: fairer Wettbewerb."],
+["Prozesspolitik","Der Staat greift als „Spieler“ direkt in den Wirtschaftsablauf ein (Produktion, Konsum, Investitionen). Kurz- bis mittelfristig."],
+["Konjunkturpolitik","Teil der Prozesspolitik: soll eine gleichmäßige Konjunkturentwicklung erreichen."],
+["Wachstumspolitik","Teil der Prozesspolitik: soll Investitionen langfristig sichern."],
+["Strukturpolitik","Teil der Prozesspolitik: gegen regionale Ungleichgewichte und Krisen einzelner Branchen."],
+["Fiskalpolitik","Wirtschaftspolitik über Staatseinnahmen und -ausgaben (Steuern, Ausgaben, Kredite). Macht die Regierung."],
+["Geldpolitik","Steuerung von Zinsen und Geldmenge durch die Zentralbank, im Euroraum durch die unabhängige EZB."],
+["Leitzins","Zins, zu dem sich Banken bei der Zentralbank Geld leihen. Höher: Kredite teurer, die Wirtschaft wird gebremst."],
+["Schuldenbremse","Regel im Grundgesetz, die die Neuverschuldung von Bund und Ländern begrenzt."],
+["Soziale Marktwirtschaft","Verbindet die Freiheit des Marktes mit sozialer Sicherheit und staatlichen Regeln."],
+["Ordoliberalismus","Denkschule (Walter Eucken): Der Staat sichert eine Wettbewerbsordnung, greift aber kaum in den Ablauf ein."],
+["Marktkonformität","Staatliche Eingriffe sollen den Preismechanismus möglichst nicht außer Kraft setzen."],
+["Ludwig Erhard","Wirtschaftsminister ab 1949, setzte die Soziale Marktwirtschaft politisch um."],
+["Alfred Müller-Armack","Ökonom, prägte den Begriff „Soziale Marktwirtschaft“."],
+["Kartellgesetz","Ordnungspolitik: verbietet z. B. Preisabsprachen zwischen Unternehmen und schützt so den Wettbewerb."]];
+const C3 = [
+["Angebotsorientierung","Friedman/Monetarismus: Märkte sind stabil. Der Staat verbessert die Bedingungen für Unternehmen und hält sich sonst zurück."],
+["Nachfrageorientierung","Keynes: Märkte sind instabil. Der Staat stärkt in Krisen aktiv die Gesamtnachfrage."],
+["Keynesianismus","Wirtschaftstheorie nach John Maynard Keynes. Grundlage der Nachfrageorientierung."],
+["Monetarismus","Theorie nach Milton Friedman: stetige Geldmengenpolitik, Preisstabilität, wenig Staatseingriffe."],
+["Antizyklische Politik","Gegen den Konjunkturverlauf handeln: in der Krise mehr ausgeben, im Boom sparen."],
+["Deficit Spending","Staatsausgaben auf Kredit (Schulden), um in der Krise die Nachfrage zu stärken."],
+["Multiplikatoreffekt","Zusätzliche Ausgaben erhöhen das Einkommen um ein Vielfaches, weil Einkommen wieder ausgegeben wird."],
+["Time Lag","Zeitverzögerung zwischen Problem, Beschluss und Wirkung einer Maßnahme."],
+["Crowding-out","Hohe Staatsverschuldung treibt die Zinsen hoch und verdrängt private Investitionen."],
+["Mitnahmeeffekt","Eine Förderung wird für etwas genutzt, das man ohnehin getan hätte."],
+["Strohfeuer","Kurzfristiger Effekt, der nach dem Ende der Maßnahme verpufft."],
+["Deregulierung","Abbau staatlicher Vorschriften, um Märkte flexibler zu machen."],
+["Privatisierung","Staatliche Unternehmen oder Aufgaben gehen an private Eigentümer."],
+["Lohnnebenkosten","Kosten, die Arbeitgeber zusätzlich zum Lohn tragen, v. a. Sozialversicherungsbeiträge."]];
+const C4 = [
+["Magisches Sechseck","Sechs wirtschaftspolitische Ziele, die nicht alle gleichzeitig vollständig erreichbar sind."],
+["Magisches Viereck","Die vier Ziele aus dem Stabilitätsgesetz 1967: Preisniveaustabilität, hoher Beschäftigungsstand, außenwirtschaftliches Gleichgewicht, stetiges und angemessenes Wachstum."],
+["Die zwei Erweiterungsziele","Gerechte Einkommens- und Vermögensverteilung sowie Schutz der natürlichen Umwelt."],
+["Preisniveaustabilität","Das Preisniveau bleibt weitgehend stabil. Gemessen an der Inflationsrate. EZB-Ziel: 2 %."],
+["Inflation","Anhaltender Anstieg des allgemeinen Preisniveaus. Die Kaufkraft des Geldes sinkt."],
+["Arbeitslosenquote","Anteil der Arbeitslosen an den Erwerbspersonen. Misst das Ziel „hoher Beschäftigungsstand“."],
+["Außenwirtschaftliches Gleichgewicht","Exporte und Importe (Leistungsbilanz) sind annähernd ausgeglichen."],
+["Zielkonflikt","Das Erreichen eines Ziels erschwert ein anderes."],
+["Zielharmonie","Die Ziele unterstützen sich gegenseitig."],
+["Zielneutralität","Die Ziele haben keinen wesentlichen Einfluss aufeinander."],
+["Phillips-Kurve","Zusammenhang: weniger Arbeitslosigkeit geht oft mit mehr Inflation einher und umgekehrt."],
+["Gini-Koeffizient","Maß für Ungleichheit: 0 = völlig gleich verteilt, 1 = völlig ungleich."]];
+
+/* Sortierübungen */
+const S2 = { cats: ["Ordnungspolitik", "Prozesspolitik"], items: [
+["Ein Gesetz verbietet Preisabsprachen zwischen Unternehmen (Kartellverbot)",0,"Dauerhafte Spielregel für alle."],
+["Die EZB senkt den Leitzins, weil die Wirtschaft schrumpft",1,"Reaktion auf die aktuelle Lage, greift in den Ablauf ein (Geldpolitik)."],
+["Der Staat beschließt in der Rezession ein Investitionspaket für Straßen und Schulen",1,"Befristeter Eingriff gegen die Krise (Konjunkturpolitik)."],
+["Die Schuldenbremse wird im Grundgesetz verankert",0,"Dauerhafte Regel für die Haushaltspolitik."],
+["Befristete Prämie für den Kauf eines Neuwagens in der Krise",1,"Kurzfristiger Kaufanreiz, direkter Eingriff."],
+["Einführung eines gesetzlichen Mindestlohns",0,"Dauerhafte Regel für den Arbeitsmarkt."],
+["Die Mehrwertsteuer wird für sechs Monate gesenkt, um den Konsum anzukurbeln",1,"Befristet, soll eine aktuelle Größe (Konsum) steuern."],
+["Die Zentralbank wird per Gesetz unabhängig von der Regierung",0,"Institutionelle Grundregel."],
+["Die Bezugsdauer des Kurzarbeitergelds wird in der Krise verlängert",1,"Reaktion auf die aktuelle Krise."],
+["Ein neues Gesetz stärkt die Verbraucherrechte beim Online-Kauf",0,"Dauerhafte Regel für alle Marktteilnehmer."],
+["Fördergeld für eine Region, in der ein Kohlekraftwerk schließt",1,"Strukturpolitik: gezielter Eingriff gegen die Krise einer Region oder Branche."],
+["Tarifautonomie: Gewerkschaften und Arbeitgeber handeln Löhne ohne den Staat aus",0,"Grundregel des Arbeitsmarktes."],
+["Befristete Energiepreisbremse wegen stark gestiegener Gaspreise",1,"Kurzfristiger Eingriff in die Preisbildung."],
+["Genehmigungsverfahren für Unternehmen werden dauerhaft vereinfacht",0,"Dauerhafte Änderung der Rahmenbedingungen."]]};
+const S3 = { cats: ["Nachfrageorientiert", "Angebotsorientiert"], items: [
+["Der Staat finanziert ein Investitionsprogramm für Schienen und Schulen",0,"Staatliche Nachfrage (G) steigt."],
+["Senkung der Steuern auf Unternehmensgewinne",1,"Verbessert die Bedingungen für Unternehmen."],
+["Abwrackprämie für den Kauf eines Neuwagens",0,"Kaufanreiz für Verbraucher (C)."],
+["Bürokratieabbau und schnellere Genehmigungen",1,"Senkt die Kosten der Unternehmen."],
+["Das Kindergeld wird erhöht, um die Kaufkraft zu stärken",0,"Mehr Einkommen → mehr Konsum."],
+["Der Kündigungsschutz wird gelockert",1,"Flexibilisierung des Arbeitsmarktes."],
+["Staatliche Unternehmen werden privatisiert",1,"Weniger Staat, mehr Markt."],
+["Senkung der Sozialversicherungsbeiträge für Arbeitgeber",1,"Senkt die Lohnnebenkosten."],
+["Die Einkommensteuer für Geringverdiener wird gesenkt",0,"Geringverdiener geben zusätzliches Geld meist direkt aus."],
+["Der Staat baut Schulden ab und spart (Haushaltskonsolidierung)",1,"Solide Staatsfinanzen, Vertrauen der Investoren."],
+["Kreditfinanziertes Konjunkturpaket in der Rezession (Deficit Spending)",0,"Klassisch keynesianisch."],
+["Agenda 2010: Arbeitsmarktreformen und Kürzungen bei der Arbeitslosenunterstützung",1,"Flexibilisierung des Arbeitsmarktes."],
+["Konsumgutscheine für alle Haushalte",0,"Direkte Stärkung der Konsumnachfrage."],
+["Steuervorteile für Investitionen in Forschung",1,"Verbessert die Investitionsbedingungen."]]};
+
+/* Quizfragen: Die erste Antwort ist jeweils die richtige (wird beim Anzeigen gemischt). */
+const Q1 = [
+{q:"Welcher Wert ist laut deinem Unterricht ein Frühindikator?",o:["Auftragslage","Arbeitslosenquote","Insolvenzen","Steuereinnahmen"],e:"Die Auftragslage zeigt, was in Zukunft produziert wird. Arbeitslosenquote, Insolvenzen und Steuereinnahmen sind Spätindikatoren."},
+{q:"Warum gilt die Arbeitslosenquote als Spätindikator?",o:["Unternehmen entlassen bzw. stellen erst ein, wenn sich die Lage länger bestätigt hat","Weil sie nur einmal im Jahr veröffentlicht wird","Weil Arbeitslose die Konjunktur vorhersagen","Weil sie nur im Boom gemessen wird"],e:"Personalentscheidungen sind teuer und werden erst getroffen, wenn ein Trend sicher ist. Deshalb reagiert der Arbeitsmarkt verzögert."},
+{q:"Kapazitätsgrenze erreicht, kaum Arbeitslosigkeit, Preise steigen stark. Welche Phase?",o:["Boom","Aufschwung","Rezession","Depression"],e:"Im Boom (Hochkonjunktur) ist die Wirtschaft voll ausgelastet. Die Inflationsgefahr steigt."},
+{q:"Wie definiert dein Unterricht eine Rezession?",o:["Stagnation oder Schrumpfen über mindestens zwei Quartale","Stagnation von einem Quartal zum anderen","Schrumpfen der Wirtschaft über mehrere Jahre","Jeder Anstieg der Arbeitslosigkeit"],e:"Rezession = mindestens zwei Quartale Stagnation oder Schrumpfen. Ein Quartal Stagnation ist ein Abschwung, mehrere Jahre Schrumpfen eine Depression."},
+{q:"Was ist laut Unterricht eine Depression?",o:["Schrumpfen der Wirtschaft über mehrere Jahre","Stagnation von einem Quartal zum anderen","Ein besonders starker Boom","Eine hohe Inflationsrate"],e:"Die Depression ist der tiefe, lange Krisenpunkt: mehrere Jahre Schrumpfen, hohe Arbeitslosigkeit."},
+{q:"Auftragslage und Geschäftsklima verbessern sich, die Arbeitslosigkeit ist noch hoch, das BIP wächst leicht. Welche Phase?",o:["Aufschwung","Boom","Rezession","Depression"],e:"Frühindikatoren zeigen nach oben, der Spätindikator Arbeitslosigkeit hinkt hinterher. Typisch für den Beginn eines Aufschwungs."},
+{q:"Welche BIP-Kennzahl nutzt man, um Wachstum und Rezession zu beurteilen?",o:["Das reale BIP","Das nominale BIP","Das BIP pro Kopf","Die Sparquote"],e:"Das reale BIP rechnet Preissteigerungen heraus. Sonst würde Inflation wie Wachstum aussehen."},
+{q:"In der Formel BIP = C + I + G + (X − M): Wofür steht G?",o:["Staatsausgaben für Güter und Dienstleistungen","Gewinne der Unternehmen","Geldmenge","Gesamtnachfrage der Haushalte"],e:"G (government) = Staatsausgaben. Ein Konjunkturpaket erhöht direkt G."},
+{q:"Die Exporte steigen stark, die Importe bleiben gleich. Was passiert mit dem BIP (sonst alles gleich)?",o:["Es steigt, weil der Außenbeitrag (X − M) größer wird","Es sinkt, weil Güter ins Ausland gehen","Es bleibt gleich, Exporte zählen nicht","Es steigt, weil C größer wird"],e:"Exporte sind Nachfrage aus dem Ausland nach inländischer Produktion. X − M wird größer, also steigt das BIP."},
+{q:"Was ist der Unterschied zwischen Konjunktur und Wirtschaftswachstum?",o:["Konjunktur = kurzfristige Schwankungen, Wachstum = langfristiger Trend","Beides ist dasselbe","Konjunktur ist langfristig, Wachstum kurzfristig","Konjunktur misst nur die Inflation"],e:"Die Konjunktur schwankt um den langfristigen Wachstumstrend herum."},
+{q:"Welcher Indikator gehört laut Unterricht zu den Präsenzindikatoren?",o:["Offene Stellen","ZEW-Index","Zinsniveau","Aktienindex"],e:"Präsenzindikatoren zeigen den Ist-Zustand: BIP, Wachstum, Sparquote, Preisniveau, offene Stellen."}];
+const Q2 = [
+{q:"Was kennzeichnet Ordnungspolitik?",o:["Sie legt langfristig die Spielregeln für alles wirtschaftliche Handeln fest","Sie greift kurzfristig in Krisen ein","Sie legt die Preise aller Güter fest","Sie wird nur von der EZB gemacht"],e:"Ordnungspolitik = Spielregeln, langfristig. Die Spielzüge machen Unternehmer und Verbraucher selbst."},
+{q:"Die EZB senkt den Leitzins, um die Wirtschaft anzukurbeln. Das ist …",o:["Prozesspolitik (Geldpolitik)","Ordnungspolitik","Fiskalpolitik der Bundesregierung","Strukturpolitik"],e:"Ein direkter, kurzfristiger Eingriff in den Wirtschaftsablauf. Zuständig ist die EZB, nicht die Regierung."},
+{q:"Wer entscheidet im Euroraum über die Leitzinsen?",o:["Die Europäische Zentralbank (EZB)","Die Bundesregierung","Der Bundestag","Das Bundeskartellamt"],e:"Die EZB ist unabhängig. Die Regierung kann nur Fiskalpolitik machen (Steuern, Staatsausgaben)."},
+{q:"Die Einführung der Schuldenbremse ist eher …",o:["Ordnungspolitik, weil sie eine dauerhafte Regel festlegt","Prozesspolitik, weil sie Geld kostet","Konjunkturpolitik","Geldpolitik"],e:"Sie ist eine dauerhafte Spielregel für die Staatsfinanzen."},
+{q:"Fördergeld für eine Region, deren wichtigste Branche wegbricht, ist …",o:["Strukturpolitik (Teil der Prozesspolitik)","Ordnungspolitik","Geldpolitik","Wachstumspolitik"],e:"Strukturpolitik soll regionale Ungleichgewichte und Krisen einzelner Branchen abfedern."},
+{q:"Welche drei Bereiche der Prozesspolitik unterscheidet dein Unterricht?",o:["Konjunktur-, Wachstums- und Strukturpolitik","Wettbewerbs-, Eigentums- und Vertragspolitik","Geld-, Lohn- und Tarifpolitik","Umwelt-, Sozial- und Bildungspolitik"],e:"Konjunkturpolitik (gleichmäßige Entwicklung), Wachstumspolitik (Investitionen sichern), Strukturpolitik (Regionen und Branchen)."},
+{q:"Was verbindet die Soziale Marktwirtschaft?",o:["Die Freiheit des Marktes mit sozialer Sicherheit und staatlichen Regeln","Staatliche Planung aller Preise mit Privateigentum","Freien Markt ganz ohne staatliche Regeln","Planwirtschaft mit Sozialversicherung"],e:"Freiheit (Wettbewerb, Eigeninitiative, Gewinnstreben) plus sozialer Ausgleich (Sozialversicherung, Umverteilung, Arbeitnehmerschutz)."},
+{q:"Welches Prinzip besagt, dass Eingriffe den Preismechanismus möglichst nicht außer Kraft setzen sollen?",o:["Marktkonformität","Sozialprinzip","Deficit Spending","Antizyklik"],e:"Marktkonforme Eingriffe arbeiten mit dem Markt statt gegen ihn."},
+{q:"Wer setzte die Soziale Marktwirtschaft als Wirtschaftsminister politisch um?",o:["Ludwig Erhard","John Maynard Keynes","Milton Friedman","Alfred Müller-Armack"],e:"Erhard setzte sie um. Müller-Armack prägte den Begriff."},
+{q:"Ein Anhänger des Ordoliberalismus würde ein großes Konjunkturprogramm am ehesten kritisieren, weil …",o:["der Staat vor allem den Rahmen setzen und nicht in den Ablauf eingreifen soll","es zu wenig Schulden macht","es die Zinsen senkt","es gegen das Kartellrecht verstößt"],e:"Ordoliberale (Eucken) setzen auf eine gute Wettbewerbsordnung. Prozesspolitik sehen sie kritisch."}];
+const Q3 = [
+{q:"Was ist laut Keynes die Ursache einer Wirtschaftskrise?",o:["Eine zu geringe gesamtwirtschaftliche Nachfrage","Zu hohe Unternehmenssteuern","Zu viel Wettbewerb","Eine zu große Geldmenge"],e:"Haushalte und Unternehmen halten sich zurück, deshalb wird weniger produziert. Der Staat soll die Lücke füllen."},
+{q:"Welche Grundannahme hat die Angebotsorientierung?",o:["Märkte sind von Natur aus stabil","Märkte sind instabil und krisenanfällig","Der Staat muss alle Preise festlegen","Nachfrage entsteht nur durch den Staat"],e:"Friedman/Monetarismus: Märkte stabilisieren sich selbst, wenn die Rahmenbedingungen stimmen."},
+{q:"Welche Rolle des Staates passt laut deinem Unterricht zur Nachfrageorientierung?",o:["Aktiv eingreifend (Prozesspolitik)","Zurückhaltend (Ordnungspolitik)","Gar keine Rolle","Nur Geldpolitik"],e:"Nachfrage ↔ Prozesspolitik, Angebot ↔ Ordnungspolitik. Diese Verbindung steht in deinem Material."},
+{q:"Was bedeutet antizyklische Fiskalpolitik?",o:["In der Krise mehr ausgeben, im Boom sparen","In der Krise sparen, im Boom mehr ausgeben","Immer gleich viel ausgeben","Nur Steuern erhöhen"],e:"Der Staat handelt gegen den Konjunkturverlauf, um die Schwankungen zu glätten."},
+{q:"Was ist Deficit Spending?",o:["Staatsausgaben auf Kredit, um in der Krise die Nachfrage zu stärken","Sparprogramm des Staates","Steuersenkung für Unternehmen","Zinserhöhung der EZB"],e:"Der Staat verschuldet sich bewusst, um die fehlende private Nachfrage auszugleichen."},
+{q:"Was beschreibt der Multiplikatoreffekt?",o:["Eine zusätzliche Ausgabe erhöht das Einkommen um ein Vielfaches","Die Geldmenge verdoppelt sich jedes Jahr","Steuern steigen mit dem Einkommen","Importe vervielfachen sich"],e:"Der Bauunternehmer zahlt Löhne, die Beschäftigten kaufen ein, die Händler bestellen nach. So wirkt ein Euro mehrfach."},
+{q:"Welche Maßnahme ist angebotsorientiert?",o:["Unternehmenssteuern senken","Konsumgutscheine verteilen","Kreditfinanziertes Konjunkturpaket","Kindergeld erhöhen"],e:"Sie verbessert die Produktionsbedingungen der Unternehmen. Die anderen stärken die Nachfrage."},
+{q:"Was ist ein Hauptrisiko der Nachfragepolitik im Boom?",o:["Inflation, weil zusätzliche Nachfrage auf eine voll ausgelastete Wirtschaft trifft","Deflation","Zu wenig Staatsverschuldung","Sinkende Löhne"],e:"Wenn nicht mehr produziert werden kann, steigen nur die Preise."},
+{q:"Was ist ein typisches Risiko der Angebotspolitik?",o:["Bessere Bedingungen führen nicht automatisch zu mehr Investitionen","Explodierende Staatsverschuldung durch Deficit Spending","Zu hohe Kaufkraft der Verbraucher","Sie wirkt zu schnell"],e:"Unternehmen können Gewinne auch ausschütten oder im Ausland investieren. Außerdem drohen mehr Ungleichheit und eine vernachlässigte Kaufkraft."},
+{q:"Was sind Time Lags?",o:["Zeitverzögerungen zwischen Problem, Beschluss und Wirkung einer Maßnahme","Steuerschulden des Staates","Lieferengpässe im Handel","Unterschiedliche Zeitzonen im Außenhandel"],e:"Wenn ein Konjunkturpaket erst wirkt, wenn der Aufschwung schon da ist, heizt es die Wirtschaft unnötig an."},
+{q:"Was bedeutet Crowding-out?",o:["Staatliche Kreditaufnahme treibt Zinsen hoch und verdrängt private Investitionen","Zu viele Menschen in Innenstädten","Unternehmen verdrängen den Staat","Importe verdrängen Exporte"],e:"Wenn der Staat viel Geld leiht, werden Kredite teurer und Unternehmen investieren weniger."},
+{q:"Die Agenda 2010 (Arbeitsmarktreformen, gelockerte Regeln) gilt als …",o:["angebotsorientiert","nachfrageorientiert","Geldpolitik der EZB","Deficit Spending"],e:"Sie sollte den Arbeitsmarkt flexibler machen und so die Bedingungen für Unternehmen verbessern."}];
+const Q4 = [
+{q:"Welches Ziel gehört NICHT zum ursprünglichen magischen Viereck von 1967?",o:["Schutz der natürlichen Umwelt","Preisniveaustabilität","Hoher Beschäftigungsstand","Außenwirtschaftliches Gleichgewicht"],e:"Umweltschutz und gerechte Verteilung sind die zwei Erweiterungsziele des Sechsecks."},
+{q:"Warum heißt das Sechseck „magisch“?",o:["Weil die vollständige gleichzeitige Erreichung aller Ziele nahezu unmöglich ist","Weil es von Zauberern erfunden wurde","Weil alle Ziele automatisch erreicht werden","Weil es sechs Ecken hat"],e:"Zielkonflikte verhindern, dass alle Ziele gleichzeitig vollständig erreicht werden."},
+{q:"Steigende Beschäftigung → höhere Nachfrage → Preise steigen. Welche Zielbeziehung ist das?",o:["Zielkonflikt zwischen Beschäftigung und Preisniveaustabilität","Zielharmonie zwischen Beschäftigung und Preisniveaustabilität","Zielneutralität","Zielharmonie zwischen Umwelt und Wachstum"],e:"Das ist der klassische Konflikt aus deinem Material (Phillips-Kurve)."},
+{q:"Unternehmen produzieren mehr und brauchen mehr Arbeitskräfte. Welche Zielbeziehung?",o:["Zielharmonie zwischen Wachstum und Beschäftigung","Zielkonflikt zwischen Wachstum und Beschäftigung","Zielneutralität","Zielkonflikt zwischen Umwelt und Verteilung"],e:"Wachstum und Beschäftigung unterstützen sich."},
+{q:"Was bedeutet Zielneutralität?",o:["Die Ziele haben keinen wesentlichen Einfluss aufeinander","Beide Ziele werden verfehlt","Ein Ziel ist wichtiger als das andere","Die Ziele unterstützen sich"],e:"Beispiel aus dem Material: Umweltschutz und außenwirtschaftliches Gleichgewicht."},
+{q:"Der Staat startet im Boom ein kreditfinanziertes Konjunkturprogramm. Welches Ziel ist am stärksten gefährdet?",o:["Preisniveaustabilität","Hoher Beschäftigungsstand","Gerechte Verteilung","Wachstum"],e:"Zusätzliche Nachfrage trifft auf ausgelastete Kapazitäten: Die Preise steigen. Antizyklisch wäre jetzt Sparen."},
+{q:"Woran misst man das Ziel Preisniveaustabilität?",o:["An der Inflationsrate (Verbraucherpreisindex)","An der Arbeitslosenquote","Am Gini-Koeffizienten","An der Leistungsbilanz"],e:"Die EZB strebt mittelfristig 2 % Inflation an."},
+{q:"Woran misst man das außenwirtschaftliche Gleichgewicht?",o:["An der Leistungsbilanz bzw. dem Außenbeitrag (X − M)","An der Sparquote","Am Leitzins","Am Steueraufkommen"],e:"Ziel: Exporte und Importe sind annähernd ausgeglichen."},
+{q:"Der Staat fördert den Ausbau erneuerbarer Energien mit Investitionen. Welche Beziehung ist möglich?",o:["Harmonie zwischen Umweltschutz und Beschäftigung/Wachstum","Konflikt zwischen Umweltschutz und Beschäftigung, immer","Neutralität zwischen allen Zielen","Konflikt zwischen Preisniveau und Verteilung"],e:"Die Investitionen schaffen Aufträge und Jobs und senken gleichzeitig Emissionen."},
+{q:"Starke Steuersenkungen für Unternehmen können Wachstum fördern. Welches Ziel kann dabei in Konflikt geraten?",o:["Gerechte Einkommens- und Vermögensverteilung","Hoher Beschäftigungsstand","Wachstum","Außenwirtschaftliches Gleichgewicht, immer"],e:"Profitieren vor allem Unternehmen und Kapitalbesitzer, kann die Ungleichheit wachsen."},
+{q:"Welches Gesetz enthält die vier Ziele des magischen Vierecks?",o:["Das Stabilitäts- und Wachstumsgesetz von 1967","Das Grundgesetz von 1949","Das Kartellgesetz","Das Mindestlohngesetz"],e:"Das Stabilitätsgesetz verpflichtet den Staat auf Preisniveaustabilität, Beschäftigung, außenwirtschaftliches Gleichgewicht und Wachstum."}];
+
+/* Fälle */
+const caseTable = rows => '<div class="tw"><table class="t">' + rows.map(r => '<tr><td>' + r[0] + '</td><td><b>' + r[1] + '</b></td></tr>').join('') + '</table></div>';
+const FA = { ctx: '<p><b>Land A</b> (fiktive Daten)</p>' + caseTable([
+ ["Reales BIP (ggü. Vorquartal)","Q1: −0,3 % · Q2: −0,5 %"],["Arbeitslosenquote","5,9 % → 6,7 %"],["Inflationsrate","1,6 %"],
+ ["Auftragslage / ifo-Geschäftsklima","seit 6 Monaten fallend"],["Insolvenzen","steigend"]]) +
+ '<p>Zeitungsnotiz: Unternehmen verschieben Investitionen, Verbraucher halten ihr Geld zusammen.</p>',
+ qs: [
+ {q:"Ordne die Lage in den Konjunkturzyklus ein.",o:["Rezession: BIP schrumpft zwei Quartale, Arbeitslosigkeit und Insolvenzen steigen","Boom: Die Inflation ist niedrig","Aufschwung: Die Arbeitslosigkeit steigt","Depression: Die Wirtschaft schrumpft seit vielen Jahren"],e:"Zwei Quartale Schrumpfen = Rezession nach deiner Unterrichtsdefinition. Die Frühindikatoren zeigen weiter nach unten."},
+ {q:"Welche Ziele des magischen Sechsecks sind vor allem gefährdet?",o:["Wachstum und hoher Beschäftigungsstand","Preisniveaustabilität und Umweltschutz","Nur das außenwirtschaftliche Gleichgewicht","Keines, die Inflation ist ja niedrig"],e:"BIP sinkt (Wachstum), Arbeitslosenquote steigt (Beschäftigung). Die Inflation liegt sogar unter 2 %."},
+ {q:"Wo liegt die Ursache des Problems?",o:["Bei der Nachfrage: Haushalte und Unternehmen geben zu wenig aus","Beim Angebot: Die Unternehmen haben zu hohe Kosten","Bei zu hoher Inflation","Beim Außenhandelsüberschuss"],e:"Die Zeitungsnotiz zeigt Kaufzurückhaltung und verschobene Investitionen. Also fehlt Nachfrage."},
+ {q:"Welche Maßnahme passt am besten?",o:["Der Staat zieht öffentliche Investitionen vor (Schulen, Schienen), befristet und kreditfinanziert","Der Staat kürzt seine Ausgaben","Die Mehrwertsteuer wird erhöht","Der Kündigungsschutz wird gelockert"],e:"Nachfrageorientiert und antizyklisch: G steigt, Aufträge entstehen, Jobs werden gesichert."},
+ {q:"Wie ordnest du diese Maßnahme ein?",o:["Prozesspolitik (Konjunkturpolitik), nachfrageorientiert","Ordnungspolitik, angebotsorientiert","Geldpolitik der EZB","Ordnungspolitik, nachfrageorientiert"],e:"Ein befristeter, direkter Eingriff gegen die Krise."},
+ {q:"Welches Gegenargument ist in der Beurteilung am stärksten?",o:["Steigende Staatsverschuldung und Time Lags: Die Wirkung kommt evtl. zu spät","Die Inflation würde sofort auf 10 % springen","Das Kartellrecht verbietet Staatsaufträge","Die Arbeitslosigkeit würde dadurch steigen"],e:"Bei 1,6 % Inflation ist die Inflationsgefahr gering. Realistische Gegenargumente sind Schulden (Schuldenbremse) und die Zeitverzögerung."}],
+ sol: `<h4>Musterlösung in Kurzform</h4>
+<p><b>Diagnose:</b> Das reale BIP ist zwei Quartale in Folge geschrumpft (−0,3 % und −0,5 %). Nach unserer Definition liegt eine Rezession vor. Das bestätigen der Spätindikator Arbeitslosenquote (5,9 % → 6,7 %), steigende Insolvenzen und die fallenden Frühindikatoren.</p>
+<p><b>Bedrohte Ziele:</b> stetiges Wachstum und hoher Beschäftigungsstand. Die Preisniveaustabilität ist nicht gefährdet (1,6 %).</p>
+<p><b>Strategie und Maßnahme:</b> Die Ursache ist eine zu schwache Nachfrage. Deshalb empfiehlt sich eine nachfrageorientierte, prozesspolitische Maßnahme: ein befristetes, kreditfinanziertes Investitionsprogramm (Sanierung von Schulen, Ausbau der Schiene).</p>
+<p><b>Wirkungskette:</b> Staatsausgaben (G) ↑ → Aufträge für Bauunternehmen → Produktion und Beschäftigung ↑ → Einkommen ↑ → Konsum ↑ (Multiplikator) → BIP ↑, Arbeitslosigkeit ↓.</p>
+<p><b>Beurteilung:</b> Dafür spricht, dass die Maßnahme direkt an der Ursache ansetzt und kaum Inflationsgefahr besteht. Zusätzlich verbessern die Investitionen langfristig die Infrastruktur. Dagegen sprechen die steigende Staatsverschuldung (Grenzen der Schuldenbremse) und Time Lags: Planung und Bau dauern, die Wirkung kommt evtl. erst im Aufschwung. <b>Fazit:</b> Wenn die Projekte schnell umsetzbar sind, halte ich die Maßnahme für geeignet.</p>`};
+const FB = { ctx: '<p><b>Land B</b> (fiktive Daten)</p>' + caseTable([
+ ["Reales BIP (ggü. Vorjahr)","+3,1 %"],["Arbeitslosenquote","3,3 %, viele offene Stellen"],["Inflationsrate","5,8 %"],
+ ["Kapazitätsauslastung","sehr hoch, Lieferzeiten steigen"],["Tariflöhne","+6 %"]]),
+ qs: [
+ {q:"Welche Phase liegt vor?",o:["Boom (Hochkonjunktur)","Rezession","Depression","Abschwung"],e:"Starkes Wachstum, Kapazitätsgrenze erreicht, kaum Arbeitslosigkeit, hohe Inflation."},
+ {q:"Welches Ziel ist verletzt?",o:["Preisniveaustabilität","Hoher Beschäftigungsstand","Wachstum","Keines"],e:"5,8 % Inflation liegen weit über dem EZB-Ziel von 2 %."},
+ {q:"Was würde ein Keynesianer dem Staat jetzt raten?",o:["Ausgaben senken, Projekte verschieben, Rücklagen bilden (antizyklisch)","Ein großes Konjunkturpaket auflegen","Steuern für alle senken","Kindergeld erhöhen"],e:"Antizyklisch heißt im Boom: die Nachfrage dämpfen und sparen."},
+ {q:"Welche Institution kann die Zinsen erhöhen, um die Inflation zu bremsen?",o:["Die EZB","Die Bundesregierung","Das Bundeskartellamt","Die Gewerkschaften"],e:"Geldpolitik macht im Euroraum die unabhängige EZB."},
+ {q:"Welcher Zielkonflikt droht bei einer harten Bremsung?",o:["Preisniveaustabilität ↔ Beschäftigung und Wachstum","Umwelt ↔ außenwirtschaftliches Gleichgewicht","Wachstum ↔ Beschäftigung","Es gibt keinen Konflikt"],e:"Weniger Nachfrage senkt den Preisdruck, kann aber Jobs und Wachstum kosten."},
+ {q:"Welches Problem nennt die Kritik an der Nachfragepolitik genau hier?",o:["Im Boom wird politisch selten gespart, Kürzungen sind unbeliebt","Die Inflation ist zu niedrig","Time Lags gibt es im Boom nicht","Deficit Spending ist im Boom vorgeschrieben"],e:"Die antizyklische Theorie verlangt Sparen im Boom. In der Praxis passiert das oft nicht."}],
+ sol: `<h4>Musterlösung in Kurzform</h4>
+<p><b>Diagnose:</b> Wachstum von 3,1 %, sehr hohe Auslastung, Arbeitslosenquote nur 3,3 % und viele offene Stellen: Land B befindet sich im Boom.</p>
+<p><b>Bedrohtes Ziel:</b> Preisniveaustabilität (5,8 % Inflation). Es droht eine Lohn-Preis-Spirale (Tariflöhne +6 %).</p>
+<p><b>Maßnahme:</b> Antizyklisch-nachfrageorientiert sollte der Staat seine Ausgaben zurückfahren, nicht dringende Projekte verschieben und Rücklagen für die nächste Krise bilden (Prozesspolitik). Ergänzend kann die EZB den Leitzins erhöhen (Geldpolitik, nicht Sache der Regierung).</p>
+<p><b>Wirkungskette:</b> weniger Staatsnachfrage bzw. teurere Kredite → Gesamtnachfrage ↓ → weniger Preiserhöhungsspielraum → Inflation ↓.</p>
+<p><b>Beurteilung:</b> Dafür spricht, dass die Maßnahme die Überhitzung bremst und Spielraum für spätere Krisen schafft. Dagegen spricht der Zielkonflikt mit Beschäftigung und Wachstum. Außerdem sind Kürzungen politisch schwer durchsetzbar. <b>Fazit:</b> Eine maßvolle Dämpfung ist sinnvoll, weil die Arbeitslosigkeit sehr niedrig ist und daher Spielraum besteht.</p>`};
+const FC = { ctx: '<p><b>Land C</b> (fiktive Daten)</p>' + caseTable([
+ ["Reales BIP","seit drei Jahren zwischen −0,3 % und +0,4 %"],["Inflationsrate","2,1 %"],["Arbeitslosenquote","6,0 %, langsam steigend"],
+ ["Privater Konsum","stabil"],["Unternehmensumfrage","größte Probleme: hohe Energiekosten, Bürokratie, Fachkräftemangel"],["Investitionen","Unternehmen investieren zunehmend im Ausland"]]),
+ qs: [
+ {q:"Warum passt ein klassisches Konjunkturpaket hier schlecht?",o:["Die Nachfrage ist stabil. Das Problem sind die schlechten Bedingungen für Unternehmen","Weil die Inflation zu hoch ist","Weil Konjunkturpakete verboten sind","Weil die Arbeitslosigkeit sinkt"],e:"Der Konsum ist stabil, Unternehmen klagen über Kosten und Bürokratie. Das ist ein Angebotsproblem."},
+ {q:"Welches Konzept passt?",o:["Angebotsorientierung","Nachfrageorientierung","Gar keine Maßnahme","Nur Geldpolitik"],e:"Ziel ist, die Produktionsbedingungen zu verbessern."},
+ {q:"Welches Maßnahmenbündel passt am besten?",o:["Genehmigungen beschleunigen, Unternehmenssteuern senken, Fachkräftezuwanderung erleichtern","Konsumgutscheine für alle Haushalte","Abwrackprämie für Neuwagen","Mehrwertsteuer erhöhen"],e:"Alle drei Maßnahmen setzen bei den Problemen aus der Unternehmensumfrage an."},
+ {q:"Ein dauerhaft vereinfachtes Genehmigungsrecht ist …",o:["Ordnungspolitik, passend zur Angebotsorientierung","Prozesspolitik, nachfrageorientiert","Geldpolitik","Strukturpolitik"],e:"Es ändert dauerhaft die Spielregeln. Laut deinem Material: Angebot ↔ Ordnungspolitik."},
+ {q:"Welche Kritik ist am treffendsten?",o:["Die Wirkung kommt erst nach Jahren, und höhere Gewinne werden nicht zwingend investiert","Die Inflation steigt sofort stark","Die Staatsverschuldung explodiert durch Deficit Spending","Die Maßnahme wirkt zu schnell"],e:"Typische Risiken der Angebotspolitik. Ungleichheit und Steuerausfälle kannst du ergänzen."},
+ {q:"Welche Zielbeziehung entsteht bei Steuersenkungen für Unternehmen?",o:["Mögliche Harmonie Wachstum/Beschäftigung, möglicher Konflikt mit gerechter Verteilung","Konflikt zwischen Wachstum und Beschäftigung","Nur Zielneutralität","Harmonie mit allen sechs Zielen"],e:"Mehr Investitionen fördern Wachstum und Jobs. Profitieren vor allem Unternehmen, kann die Ungleichheit steigen."}],
+ sol: `<h4>Musterlösung in Kurzform</h4>
+<p><b>Diagnose:</b> Das BIP stagniert seit drei Jahren. Die Arbeitslosigkeit steigt langsam, Inflation (2,1 %) und Konsum sind stabil. Es handelt sich nicht um einen kurzen Konjunktureinbruch, sondern um eine anhaltende Wachstumsschwäche.</p>
+<p><b>Bedrohte Ziele:</b> Wachstum, mittelfristig auch Beschäftigung.</p>
+<p><b>Ursache und Strategie:</b> Die Unternehmensumfrage zeigt ein Angebotsproblem (Energiekosten, Bürokratie, Fachkräfte). Deshalb empfiehlt sich eine angebotsorientierte Politik, vor allem ordnungspolitisch: schnellere Genehmigungsverfahren, Bürokratieabbau, ein Gesetz zur Erleichterung der Fachkräftezuwanderung, dazu niedrigere Unternehmenssteuern.</p>
+<p><b>Wirkungskette:</b> niedrigere Kosten und weniger Bürokratie → höhere erwartete Gewinne → Unternehmen investieren wieder im Inland → Produktion und Arbeitsplätze ↑ → Wachstum ↑.</p>
+<p><b>Beurteilung:</b> Dafür spricht, dass die Maßnahmen an der Ursache ansetzen und marktkonform sind. Dagegen spricht, dass sie erst nach Jahren wirken, Steuerausfälle gegenfinanziert werden müssen, Gewinne nicht automatisch investiert werden und die Ungleichheit steigen kann. <b>Fazit:</b> Langfristig sinnvoll, am besten ergänzt durch eine soziale Absicherung.</p>`};
+const FD = { ctx: '<p><b>Land D</b> (fiktive Daten)</p>' + caseTable([
+ ["Inflationsrate","6,9 % (vor allem durch stark gestiegene Energiepreise)"],["Reales BIP","zwei Quartale −0,2 % und −0,4 %"],
+ ["Arbeitslosenquote","5,4 % → 5,9 %"],["Geschäftsklima","fallend"],["Verbraucher","sparen aus Sorge vor weiteren Preissteigerungen"]]),
+ task: "<p><b>Aufgaben (ca. 20 Minuten, wie in der Klausur):</b></p><ol><li>Ordne die wirtschaftliche Lage ein.</li><li>Entwickle eine wirtschaftspolitische Maßnahme und begründe sie.</li><li>Beurteile deine Maßnahme.</li></ol><p class='small'>Schreib stichpunktartig hier oder auf Papier. Danach vergleichst du mit der Musterlösung.</p>",
+ sol: `<h4>Musterlösung in Kurzform</h4>
+<p><b>Diagnose:</b> Das BIP ist zwei Quartale geschrumpft: Rezession. Gleichzeitig liegt die Inflation bei 6,9 %. Diese Kombination heißt <b>Stagflation</b>. Ursache ist ein Kostenschock auf der Angebotsseite (Energiepreise).</p>
+<p><b>Bedrohte Ziele:</b> Preisniveaustabilität, Wachstum und Beschäftigung zugleich.</p>
+<p><b>Dilemma:</b> Ein großes Konjunkturpaket würde die Nachfrage und damit die Inflation weiter anheizen. Ein harter Sparkurs würde die Rezession verschärfen. Das ist der Zielkonflikt zwischen Preisniveaustabilität und Beschäftigung.</p>
+<p><b>Maßnahme:</b> angebotsorientiert an der Ursache ansetzen: das Energieangebot ausweiten, z. B. den Ausbau erneuerbarer Energien durch schnellere Genehmigungen beschleunigen (Ordnungspolitik). Ergänzend eine befristete, gezielte Entlastung für Haushalte mit niedrigem Einkommen (Prozesspolitik, sozialer Ausgleich der SMW).</p>
+<p><b>Wirkungskette:</b> mehr und günstigere Energie → Produktionskosten ↓ → Unternehmen müssen Preise weniger erhöhen und können mehr produzieren → Inflation ↓, Produktion und Beschäftigung ↑.</p>
+<p><b>Beurteilung:</b> Dafür spricht, dass die Maßnahme an der Ursache ansetzt und eine Harmonie mit dem Umweltschutz möglich ist. Die gezielte Hilfe ist sozial und vermeidet Mitnahmeeffekte. Dagegen spricht, dass der Ausbau Jahre dauert (Time Lag) und die Entlastungen Geld kosten. Erhöht die EZB gleichzeitig die Zinsen, kann sich die Rezession verschärfen. <b>Fazit:</b> Die Kombination ist sinnvoll, weil sie weder die Inflation anheizt noch die Schwächsten allein lässt.</p>`};
+
+const UNITS = [
+ {id:"u1",day:0,title:"Konjunkturzyklus und BIP",sub:"Phasen, BIP-Formel, Indikatoren",steps:[
+   {t:"lesson",name:"Verstehen",html:L1},{t:"cards",name:"Vokabeln",cards:C1},{t:"quiz",name:"Quiz",qs:Q1}]},
+ {id:"u2",day:0,prio:true,title:"Ordnungs- und Prozesspolitik",sub:"Spielregeln vs. Spielzüge, Soziale Marktwirtschaft",steps:[
+   {t:"lesson",name:"Verstehen",html:L2},{t:"cards",name:"Vokabeln",cards:C2},{t:"sort",name:"Zuordnen",data:S2},{t:"quiz",name:"Quiz",qs:Q2}]},
+ {id:"u3",day:0,title:"Angebot vs. Nachfrage",sub:"Friedman gegen Keynes: Ideen, Maßnahmen, Kritik",steps:[
+   {t:"lesson",name:"Verstehen",html:L3},{t:"cards",name:"Vokabeln",cards:C3},{t:"sort",name:"Zuordnen",data:S3},{t:"quiz",name:"Quiz",qs:Q3}]},
+ {id:"u4",day:1,title:"Magisches Sechseck",sub:"Ziele, Konflikte, Harmonien",steps:[
+   {t:"lesson",name:"Verstehen",html:L4},{t:"cards",name:"Vokabeln",cards:C4},{t:"quiz",name:"Quiz",qs:Q4}]},
+ {id:"u5",day:1,prio:true,title:"Fall-Training",sub:"Maßnahmen entwickeln, begründen, beurteilen",steps:[
+   {t:"lesson",name:"Klausur-Schema",html:L5},{t:"case",name:"Fall A",c:FA},{t:"case",name:"Fall B",c:FB},{t:"case",name:"Fall C",c:FC}]},
+ {id:"u6",day:1,prio:true,title:"Generalprobe",sub:"Gemischtes Quiz, Fehler wiederholen, Probeaufgabe",steps:[
+   {t:"mixed",name:"Gemischtes Quiz"},{t:"mistakes",name:"Fehler wiederholen"},{t:"write",name:"Probeaufgabe",c:FD}]}
+];
+
+/* IDs für alle Fragen */
+const QMAP = {};
+UNITS.forEach(u => u.steps.forEach((st, si) => {
+  const list = st.t === 'quiz' ? st.qs : (st.t === 'case' ? st.c.qs : null);
+  if (!list) return;
+  list.forEach((q, qi) => { q.id = u.id + '-' + si + '-' + qi; q.ctx = st.t === 'case' ? st.c.ctx : null; q.pool = st.t === 'quiz'; QMAP[q.id] = q; });
+}));
+
+/* ---------- Zustand und Navigation ---------- */
+let S = { view: 'home', u: 0, s: 0 };
+let R = null;
+const key = (u, s) => UNITS[u].id + '-' + s;
+const unitDone = i => UNITS[i].steps.every((_, s) => P.done[key(i, s)]);
+function stepsDone(i) { return UNITS[i].steps.filter((_, s) => P.done[key(i, s)]).length; }
+function markDone() { P.done[key(S.u, S.s)] = 1; save(); }
+function toast(msg) { const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2600); }
+function go(view, u, s) { S = { view, u: u ?? S.u, s: s ?? 0 }; R = null; render(); window.scrollTo(0, 0); }
+function nextStep() {
+  markDone();
+  const u = UNITS[S.u];
+  if (S.s < u.steps.length - 1) go('unit', S.u, S.s + 1);
+  else { go('home'); toast('Block ' + (S.u + 1) + ' geschafft. Stark!'); }
+}
+function nextLabel() { const u = UNITS[S.u]; return S.s < u.steps.length - 1 ? 'Weiter: ' + u.steps[S.s + 1].name : 'Block abschließen'; }
+
+function render() {
+  const m = $('#main');
+  if (S.view === 'home') m.innerHTML = viewHome();
+  else if (S.view === 'cheat') m.innerHTML = viewCheat();
+  else { m.innerHTML = viewUnitShell(); renderStep(); }
+  m.querySelectorAll('table').forEach(t => { if (!t.parentElement.classList.contains('tw')) { const w = document.createElement('div'); w.className = 'tw'; t.before(w); w.appendChild(t); } });
+  bindCommon();
+}
+function bindCommon() {
+  document.querySelectorAll('[data-go-unit]').forEach(b => b.onclick = () => go('unit', +b.dataset.goUnit, firstOpen(+b.dataset.goUnit)));
+  document.querySelectorAll('[data-step]').forEach(b => b.onclick = () => go('unit', S.u, +b.dataset.step));
+  document.querySelectorAll('[data-home]').forEach(b => b.onclick = () => go('home'));
+  document.querySelectorAll('[data-cheat]').forEach(b => b.onclick = () => go('cheat'));
+}
+function firstOpen(i) { const n = UNITS[i].steps.findIndex((_, s) => !P.done[key(i, s)]); return n < 0 ? 0 : n; }
+
+/* ---------- Startseite ---------- */
+function viewHome() {
+  const doneArr = UNITS.map((_, i) => unitDone(i));
+  const nDone = doneArr.filter(Boolean).length;
+  const next = doneArr.indexOf(false);
+  const day = new Date().getDay();
+  let h = '<header class="hero"><p class="eyebrow">Klausur Wirtschaftspolitik Nr. 2 · Montag</p><h1>Fit für Montag</h1>' +
+    '<p class="intro">6 Lernblöcke à 30 Minuten: drei am Samstag, drei am Sonntag. Jeder Block hat einen Lerntext, Karteikarten und ein Quiz. Schwerpunkt-Themen der Checkliste sind markiert.</p>' +
+    homeWave(doneArr, next) + '<p class="prog">' + (nDone === 6 ? 'Alle 6 Blöcke erledigt. Du bist vorbereitet.' : nDone + ' von 6 Blöcken erledigt') + '</p></header>';
+  [['Samstag', 0], ['Sonntag', 1]].forEach(([name, d]) => {
+    const today = (d === 0 && day === 6) || (d === 1 && day === 0);
+    h += '<div class="day"><h2>' + name + '</h2><span>' + (today ? 'heute · ' : '') + '3 × 30 Minuten</span></div><div class="units">';
+    UNITS.forEach((u, i) => {
+      if (u.day !== d) return;
+      const dn = doneArr[i];
+      h += '<button class="unit' + (dn ? ' done' : '') + '" data-go-unit="' + i + '"><span class="num">' + (dn ? '✓' : i + 1) + '</span>' +
+        '<span><span class="ttl">' + u.title + '</span><br><span class="sub">' + u.sub + '</span><span class="chips">' +
+        (u.prio ? '<span class="chip prio">Klausur-Schwerpunkt</span>' : '') + (i === next ? '<span class="chip">Jetzt dran</span>' : '') + '</span></span>' +
+        '<span class="meta">30 Min<br>' + stepsDone(i) + '/' + u.steps.length + '</span></button>';
+    });
+    h += '</div>';
+  });
+  h += '<button class="linkcard" data-cheat><h4>Spickzettel für Montagmorgen</h4><p class="small" style="margin:.3em 0 0">Klausur-Algorithmus, Kriterien und die wichtigsten Zuordnungen auf einer Seite.</p></button>';
+  h += '<div class="reset" id="resetbox"><button class="btn ghost" id="reset">Fortschritt zurücksetzen</button></div>';
+  setTimeout(() => {
+    const r = $('#reset'); if (!r) return;
+    r.onclick = () => {
+      $('#resetbox').innerHTML = '<span>Wirklich alles zurücksetzen?</span><button class="btn warn" id="r2">Ja, zurücksetzen</button><button class="btn ghost" id="r3">Abbrechen</button>';
+      $('#r2').onclick = () => { P = { done: {}, score: {}, wrong: {}, notes: {} }; save(); go('home'); toast('Fortschritt gelöscht'); };
+      $('#r3').onclick = () => go('home');
+    };
+  });
+  return h;
+}
+
+/* ---------- Spickzettel ---------- */
+function viewCheat() {
+  return '<div class="top"><div class="toprow"><button class="back" data-home>← Plan</button><h2>Spickzettel</h2></div></div><article class="lesson">' +
+  '<h3>Klausur-Algorithmus</h3><ol class="big"><li><b>Diagnose:</b> Phase mit 2–3 Indikatoren belegen</li><li><b>Bedrohtes Ziel</b> im Sechseck nennen</li><li><b>Strategie:</b> Angebot oder Nachfrage? Ordnung oder Prozess?</li><li><b>Maßnahme</b> und Wirkungskette (→ → →)</li><li><b>Beurteilung:</b> 2 × Pro, 2 × Contra, Zielkonflikt, Fazit</li></ol>' +
+  '<h3>Phasen (Unterricht)</h3><p>Aufschwung → Boom → Rezession → Depression.<br>Abschwung = 1 Quartal Stagnation · Rezession = mind. 2 Quartale Stagnation/Schrumpfen · Depression = mehrere Jahre Schrumpfen</p>' +
+  '<p class="formula">BIP = C + I + G + (X − M)</p>' +
+  '<h3>Indikatoren</h3><p><b>Früh:</b> Gewinnerwartung, Auftragslage, Geschäftsklima, ZEW, Aktienindex<br><b>Präsenz:</b> BIP, Wachstum, Sparquote, Preisniveau, offene Stellen<br><b>Spät:</b> Arbeitslosenquote, Inflation, Insolvenzen, Steuereinnahmen, Zinsniveau</p>' +
+  '<h3>Angebot vs. Nachfrage</h3><table class="t"><tr><th></th><th>Angebot</th><th>Nachfrage</th></tr><tr><td>Denker</td><td>Friedman</td><td>Keynes</td></tr><tr><td>Märkte</td><td>stabil</td><td>instabil</td></tr><tr><td>Staat</td><td>zurückhaltend · Ordnungspolitik</td><td>aktiv · Prozesspolitik</td></tr><tr><td>Ziel</td><td>Preisstabilität, Wettbewerb</td><td>Vollbeschäftigung</td></tr><tr><td>Maßnahmen</td><td>Unternehmenssteuern ↓, Bürokratie ↓, flexibler Arbeitsmarkt</td><td>Staatsinvestitionen, Steuern ↓ für Geringverdiener, Deficit Spending</td></tr><tr><td>Risiken</td><td>Ungleichheit, Kaufkraft vernachlässigt, keine Investitionsgarantie</td><td>Schulden, Inflation, Time Lags</td></tr></table>' +
+  '<h3>Ordnung vs. Prozess</h3><p><b>Ordnungspolitik</b> = Spielregeln, langfristig (Kartellgesetz, Mindestlohn, Schuldenbremse).<br><b>Prozesspolitik</b> = Eingreifen ins Spiel, kurz-/mittelfristig: Konjunktur-, Wachstums-, Strukturpolitik (Konjunkturpaket, Abwrackprämie). Zinsen macht die <b>EZB</b>.</p>' +
+  '<h3>Sechseck</h3><p>Preisniveaustabilität · Beschäftigung · außenwirtschaftliches Gleichgewicht · Wachstum (Viereck, 1967) + gerechte Verteilung · Umweltschutz.<br><b>Konflikt:</b> Beschäftigung ↔ Preise; Wachstum ↔ Umwelt. <b>Harmonie:</b> Wachstum ↔ Beschäftigung.</p>' +
+  '<h3>Beurteilungskriterien</h3><p>Wirksamkeit · Zeit (Time Lags) · Nebenwirkungen (Zielkonflikte) · Kosten (Schulden) · SMW (marktkonform, sozial?) · Nachhaltigkeit</p>' +
+  '<h3>Soziale Marktwirtschaft</h3><p>Freiheit des Marktes + sozialer Ausgleich + staatliche Spielregeln. Erhard (Umsetzung), Müller-Armack (Begriff).</p></article>' +
+  '<button class="btn wide" data-home>Zurück zum Plan</button>';
+}
+
+/* ---------- Einheit ---------- */
+function viewUnitShell() {
+  const u = UNITS[S.u];
+  return '<div class="top"><div class="toprow"><button class="back" data-home>← Plan</button><h2>' + (S.u + 1) + ' · ' + u.title + '</h2></div>' +
+    '<nav class="steps">' + u.steps.map((st, i) => '<button class="stp' + (i === S.s ? ' on' : '') + (P.done[key(S.u, i)] ? ' ok' : '') + '" data-step="' + i + '">' + st.name + '</button>').join('') + '</nav></div><section id="step"></section>';
+}
+function renderStep() {
+  const st = UNITS[S.u].steps[S.s], el = $('#step');
+  if (st.t === 'lesson') {
+    el.innerHTML = '<article class="lesson">' + st.html + '</article><button class="btn wide" id="nx">Verstanden. ' + nextLabel() + '</button>';
+    $('#nx').onclick = nextStep;
+  } else if (st.t === 'cards') runCards(el, st.cards);
+  else if (st.t === 'sort') runSort(el, st.data);
+  else if (st.t === 'quiz') runQuiz(el, st.qs, { done: () => nextStep() });
+  else if (st.t === 'case') runQuiz(el, st.c.qs, { intro: st.c.ctx, sol: st.c.sol, done: () => nextStep() });
+  else if (st.t === 'mixed') {
+    const pool = shuffle(Object.values(QMAP).filter(q => q.pool)).slice(0, 12);
+    runQuiz(el, pool, { done: () => nextStep(), title: '12 zufällige Fragen aus allen Themen' });
+  } else if (st.t === 'mistakes') {
+    const list = Object.keys(P.wrong).map(id => QMAP[id]).filter(Boolean);
+    if (!list.length) {
+      el.innerHTML = '<div class="result"><p class="big">0</p><p>Keine offenen Fehler. Alle Fragen, die du einmal falsch hattest, hast du inzwischen richtig beantwortet.</p></div><button class="btn wide" id="nx">' + nextLabel() + '</button>';
+      $('#nx').onclick = nextStep;
+    } else runQuiz(el, shuffle(list), { done: () => nextStep(), title: list.length + ' Fragen, die du schon einmal falsch hattest' });
+  } else if (st.t === 'write') runWrite(el, st.c);
+}
+
+/* Karteikarten */
+function runCards(el, cards) {
+  R = { deck: shuffle(cards.map((_, i) => i)), flipped: false, total: cards.length, again: 0 };
+  const draw = () => {
+    if (!R.deck.length) {
+      el.innerHTML = '<div class="result"><p class="big">✓</p><h3 style="margin-top:0">Alle ' + R.total + ' Karten gewusst</h3><p>' + (R.again ? R.again + '× hast du „Nochmal“ gewählt. Die Begriffe kommen im Quiz wieder.' : 'Ohne einen einzigen Fehler!') + '</p></div><button class="btn wide" id="nx">' + nextLabel() + '</button><button class="btn ghost wide" id="rp">Karten nochmal durchgehen</button>';
+      $('#nx').onclick = nextStep; $('#rp').onclick = () => runCards(el, cards); return;
+    }
+    const c = cards[R.deck[0]];
+    el.innerHTML = '<div class="counter"><span>' + (R.total - R.deck.length) + ' von ' + R.total + ' gewusst</span><span>' + R.deck.length + ' übrig</span></div>' +
+      '<button class="flash' + (R.flipped ? ' back' : '') + '" id="fc">' + (R.flipped ? '<span class="term" style="font-size:1.15rem">' + c[0] + '</span><span class="def">' + c[1] + '</span>' : '<span class="term">' + c[0] + '</span><span class="hint">Erst selbst erklären, dann tippen zum Umdrehen</span>') + '</button>' +
+      (R.flipped ? '<div class="row2"><button class="btn ghost" id="ag">Nochmal</button><button class="btn" id="kn">Gewusst</button></div>' : '');
+    $('#fc').onclick = () => { R.flipped = !R.flipped; draw(); };
+    if (R.flipped) {
+      $('#kn').onclick = () => { R.deck.shift(); R.flipped = false; draw(); };
+      $('#ag').onclick = () => { R.deck.push(R.deck.shift()); R.again++; R.flipped = false; draw(); };
+    }
+  };
+  draw();
+}
+
+/* Zuordnen */
+function runSort(el, data) {
+  R = { items: shuffle(data.items), i: 0, score: 0, ans: null };
+  const draw = () => {
+    if (R.i >= R.items.length) {
+      el.innerHTML = '<div class="result"><p class="big">' + R.score + '/' + R.items.length + '</p><p>' + (R.score >= R.items.length - 2 ? 'Sehr sicher zugeordnet.' : 'Lies bei den Fehlern die Begründung noch einmal und wiederhole die Übung.') + '</p></div><button class="btn wide" id="nx">' + nextLabel() + '</button><button class="btn ghost wide" id="rp">Übung wiederholen</button>';
+      $('#nx').onclick = nextStep; $('#rp').onclick = () => runSort(el, data); return;
+    }
+    const it = R.items[R.i];
+    let h = '<div class="qhead"><span>Maßnahme ' + (R.i + 1) + ' von ' + R.items.length + '</span><span>' + R.score + ' richtig</span></div><div class="bar"><i style="width:' + (R.i / R.items.length * 100) + '%"></i></div>' +
+      '<div class="sortcard">' + it[0] + '</div><div class="sortbtns">';
+    data.cats.forEach((c, k) => {
+      let cls = ''; if (R.ans !== null) { if (k === it[1]) cls = 'right'; else if (k === R.ans) cls = 'wrong'; }
+      h += '<button class="' + cls + '" data-c="' + k + '"' + (R.ans !== null ? ' disabled' : '') + '>' + c + '</button>';
+    });
+    h += '</div>';
+    if (R.ans !== null) { const ok = R.ans === it[1]; h += '<div class="expl ' + (ok ? 'ok' : 'bad') + '"><b>' + (ok ? 'Richtig.' : 'Falsch: ' + data.cats[it[1]] + '.') + '</b> ' + it[2] + '</div><button class="btn wide" id="sn">Nächste Maßnahme</button>'; }
+    el.innerHTML = h;
+    el.querySelectorAll('[data-c]').forEach(b => b.onclick = () => { R.ans = +b.dataset.c; if (R.ans === it[1]) R.score++; draw(); });
+    if (R.ans !== null) $('#sn').onclick = () => { R.i++; R.ans = null; draw(); };
+  };
+  draw();
+}
+
+/* Quiz */
+function runQuiz(el, items, opts) {
+  R = { items, i: 0, score: 0, ans: null, order: null };
+  const draw = () => {
+    if (R.i >= R.items.length) {
+      const pct = R.score / R.items.length;
+      el.innerHTML = '<div class="result"><p class="big">' + R.score + '/' + R.items.length + '</p><p>' +
+        (pct >= .8 ? 'Sehr gut, das sitzt.' : pct >= .6 ? 'Solide. Schau dir die falschen Antworten im Block 6 nochmal an.' : 'Lies den Lerntext noch einmal kurz und wiederhole das Quiz.') + '</p></div>' +
+        (opts.sol ? '<div class="sol">' + opts.sol + '</div>' : '') +
+        '<button class="btn wide" id="nx">' + nextLabel() + '</button><button class="btn ghost wide" id="rp">' + (opts.sol ? 'Fall wiederholen' : 'Quiz wiederholen') + '</button>';
+      $('#nx').onclick = opts.done; $('#rp').onclick = () => runQuiz(el, opts.sol ? items : shuffle(items), opts); return;
+    }
+    const it = R.items[R.i];
+    if (!R.order) R.order = shuffle(it.o.map((t, k) => ({ t, k })));
+    let h = (opts.title && R.i === 0 ? '<p class="small">' + opts.title + '</p>' : '') +
+      '<div class="qhead"><span>Frage ' + (R.i + 1) + ' von ' + R.items.length + '</span><span>' + R.score + ' richtig</span></div><div class="bar"><i style="width:' + (R.i / R.items.length * 100) + '%"></i></div>';
+    const ctx = opts.intro || it.ctx;
+    if (ctx) h += '<details class="ctx" open><summary>Fall-Material</summary>' + ctx + '</details>';
+    h += '<h3 class="q">' + it.q + '</h3><div class="opts">';
+    R.order.forEach((o, n) => {
+      let c = 'opt'; if (R.ans !== null) { if (o.k === 0) c += ' right'; else if (n === R.ans) c += ' wrong'; else c += ' dim'; }
+      h += '<button class="' + c + '" data-n="' + n + '"' + (R.ans !== null ? ' disabled' : '') + '>' + o.t + '</button>';
+    });
+    h += '</div>';
+    if (R.ans !== null) {
+      const ok = R.order[R.ans].k === 0;
+      h += '<div class="expl ' + (ok ? 'ok' : 'bad') + '"><b>' + (ok ? 'Richtig.' : 'Nicht ganz.') + '</b> ' + it.e + '</div><button class="btn wide" id="qn">' + (R.i < R.items.length - 1 ? 'Nächste Frage' : 'Auswertung') + '</button>';
+    }
+    el.innerHTML = h;
+    el.querySelectorAll('.tw table, details table').forEach(() => {});
+    el.querySelectorAll('[data-n]').forEach(b => b.onclick = () => {
+      R.ans = +b.dataset.n;
+      if (R.order[R.ans].k === 0) { R.score++; delete P.wrong[it.id]; } else P.wrong[it.id] = 1;
+      save(); draw();
+      const ex = el.querySelector('.expl'); if (ex) ex.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    });
+    if (R.ans !== null) $('#qn').onclick = () => { R.i++; R.ans = null; R.order = null; draw(); window.scrollTo(0, 0); };
+  };
+  draw();
+}
+
+/* Probeaufgabe */
+function runWrite(el, c) {
+  el.innerHTML = '<details class="ctx" open><summary>Fall-Material</summary>' + c.ctx + '</details>' + c.task +
+    '<label for="note-u6" class="small">Deine Stichpunkte (werden nur auf diesem Gerät gespeichert)</label>' +
+    '<textarea id="note-u6" placeholder="1. Lage: …&#10;2. Maßnahme: …&#10;   Wirkungskette: … → … → …&#10;3. Pro: …  Contra: …  Fazit: …"></textarea>' +
+    '<button class="btn wide" id="show">Musterlösung anzeigen</button><div id="solbox"></div>';
+  const ta = $('#note-u6'); ta.value = P.notes.u6 || '';
+  ta.oninput = () => { P.notes.u6 = ta.value; save(); };
+  $('#show').onclick = () => {
+    $('#solbox').innerHTML = '<div class="sol">' + c.sol + '</div><div class="tip"><b>Selbstcheck:</b> Hast du (1) die Phase mit Daten belegt, (2) die bedrohten Ziele genannt, (3) Angebot/Nachfrage und Ordnung/Prozess zugeordnet, (4) eine Wirkungskette, (5) Pro, Contra und ein Fazit? Jeder Haken bringt Punkte.</div><button class="btn wide" id="nx">Generalprobe abschließen</button>';
+    $('#show').remove(); $('#nx').onclick = nextStep;
+  };
+}
+
+render();
+</script>
+
+</body>
+</html>
